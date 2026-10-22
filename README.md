@@ -9,6 +9,13 @@
 
 ---
 
+> **⚠️ Implementation status (2026-10-22).** This README describes the intended design. A full audit found that several
+> subsystems are currently simulated rather than implemented — the training loop runs on random tensors, the pipeline never
+> sends an on-chain transaction, and dashboard metrics are hardcoded. Read **[TECHNICAL_AUDIT.md](TECHNICAL_AUDIT.md)**
+> for the evidence and **[ENHANCEMENT_ROADMAP.md](ENHANCEMENT_ROADMAP.md)** for the remediation plan.
+
+---
+
 ## 📑 Table of Contents
 
 1. [Executive Summary & Core Mission](#1-executive-summary--core-mission)
