@@ -116,30 +116,30 @@
                 <span class="metric-title">Hospitals Connected</span>
                 <span class="metric-icon">🏥</span>
               </div>
-              <div class="metric-value">14 <span class="metric-badge green">+2 this month</span></div>
+              <div class="metric-value" id="metric-hospitals-val">3 <span class="metric-badge green">Authorized Nodes</span></div>
             </div>
             <div class="metric-card">
               <div class="metric-header">
                 <span class="metric-title">Model Updates</span>
                 <span class="metric-icon">🔄</span>
               </div>
-              <div class="metric-value">1.2k</div>
-              <div class="metric-sub">Avg 40/day</div>
+              <div class="metric-value" id="metric-updates-val">18 Submissions</div>
+              <div class="metric-sub" id="metric-updates-sub">6 Federated Rounds</div>
             </div>
             <div class="metric-card">
               <div class="metric-header">
                 <span class="metric-title">Global Model</span>
                 <span class="metric-icon">⭐</span>
               </div>
-              <div class="metric-value">v4.2.1 <span class="metric-badge blue">Latest</span></div>
+              <div class="metric-value" id="metric-round-val">Round 6 <span class="metric-badge blue">Live On-Chain</span></div>
             </div>
             <div class="metric-card">
               <div class="metric-header">
                 <span class="metric-title">System Status</span>
                 <span class="metric-icon">🛡️</span>
               </div>
-              <div class="metric-value" style="color: var(--accent-green);">ACTIVE</div>
-              <div class="metric-sub" style="color: var(--accent-green);">● Secured</div>
+              <div class="metric-value" id="metric-status-val" style="color: var(--accent-green);">ACTIVE</div>
+              <div class="metric-sub" id="metric-status-sub" style="color: var(--accent-green);">● EVM & IPFS Synced</div>
             </div>
           </div>
 
@@ -432,14 +432,14 @@
               <div class="diag-info-icon blue">📊</div>
               <div class="diag-info-text">
                 <h4>Global Consensus</h4>
-                <p>Cross-referenced with 1.2M anonymized case studies across the network.</p>
+                <p id="cross-ref-text">Cross-referenced with verified on-chain clinical checkpoints across 3 institutional nodes.</p>
               </div>
             </div>
             <div class="diag-info-card">
               <div class="diag-info-icon green">🛡️</div>
               <div class="diag-info-text">
                 <h4>Secure Compute</h4>
-                <p>Differential privacy δ=0.1 applied to all output weights.</p>
+                <p>Differential Privacy (DP-SGD) with gradient clipping and on-chain model proof verification.</p>
               </div>
             </div>
           </div>
@@ -465,19 +465,19 @@
             <div class="global-model-profile">
               <div class="profile-header">
                 <h3>Global Model Profile</h3>
-                <span class="production-badge">Production Ready</span>
+                <span class="production-badge">Federated Consensus</span>
               </div>
               <div class="arch-label">Architecture</div>
-              <div class="arch-value">DenseNet-121-Res-v2</div>
+              <div class="arch-value" id="model-arch-name">MedCPTClassifier (NCBI Semantic Hash)</div>
 
               <div class="model-stats">
                 <div class="model-stat-item">
                   <div class="ms-label">Total Parameters</div>
-                  <div class="ms-value">7.2M</div>
+                  <div class="ms-value" id="model-total-params">~203K</div>
                 </div>
                 <div class="model-stat-item">
-                  <div class="ms-label">Training Epochs</div>
-                  <div class="ms-value">450 / 1000</div>
+                  <div class="ms-label">Training Rounds</div>
+                  <div class="ms-value" id="model-epochs-val">Round 6 (EVM Verified)</div>
                 </div>
               </div>
 
@@ -597,18 +597,18 @@
           <div class="hospital-stats-row">
             <div class="hospital-stat-card">
               <div class="hs-label">Active Nodes</div>
-              <div class="hs-value">124 <span class="hs-change">+3 this month</span></div>
+              <div class="hs-value" id="hosp-active-nodes">3 <span class="hs-change">Authorized Nodes</span></div>
             </div>
             <div class="hospital-stat-card">
               <div class="hs-label">Total Contributions</div>
-              <div class="hs-value">1.2M <span class="hs-sub">gradients</span></div>
+              <div class="hs-value" id="hosp-total-contrib">18 <span class="hs-sub">on-chain updates</span></div>
             </div>
             <div class="hospital-stat-card">
               <div class="hs-label">Blockchain Sync</div>
               <div class="integrity-badge">
                 <div class="check-icon">✓</div>
                 <div>
-                  <div class="hs-value" style="font-size:1.2rem;">99.9% Integrity</div>
+                  <div class="hs-value" id="hosp-sync-status" style="font-size:1.2rem;">Live EVM Synced</div>
                 </div>
               </div>
             </div>
@@ -627,37 +627,44 @@
               <tr>
                 <th>Hospital Name</th>
                 <th>Status</th>
-                <th>Contribution Level</th>
-                <th>Security Status</th>
-                <th>Actions</th>
+                <th>On-Chain Address</th>
+                <th>IPFS Port</th>
+                <th>Security Verification</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="hospital-table-body">
               <tr>
                 <td>
-                  <div><strong>St. Mary Medical Center</strong></div>
-                  <div style="font-size:0.75rem;color:var(--text-dim);">London, UK · Node #4292</div>
+                  <div><strong>Hospital 1 (St. Jude Node)</strong></div>
+                  <div style="font-size:0.75rem;color:var(--text-dim);">EHR Partition train_1.csv</div>
                 </td>
                 <td><span style="color:var(--accent-green);">● ACTIVE</span></td>
-                <td>
-                  <div class="contribution-cell">
-                    <span class="contribution-value">24,592</span>
-                    <div class="contribution-bar"><div class="contribution-bar-fill" style="width:30%;"></div></div>
-                  </div>
-                </td>
-                <td><span class="status-tag verified">🔗 Blockchain Verified</span></td>
-                <td></td>
+                <td><span class="mono" style="font-size:0.8rem;">0x70997970C51812dc3A010C7d01b50e0d17dc79C8</span></td>
+                <td><code>5001</code></td>
+                <td><span class="status-tag verified">🔗 On-Chain Verified</span></td>
               </tr>
               <tr>
                 <td>
-                  <div><strong>M.Hospital (Rochester)</strong></div>
-                  <div style="font-size:0.75rem;color:var(--text-dim);">Minnesota, USA · Node #8812</div>
+                  <div><strong>Hospital 2 (Johns Hopkins Node)</strong></div>
+                  <div style="font-size:0.75rem;color:var(--text-dim);">EHR Partition train_2.csv</div>
                 </td>
                 <td><span style="color:var(--accent-green);">● ACTIVE</span></td>
+                <td><span class="mono" style="font-size:0.8rem;">0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC</span></td>
+                <td><code>5002</code></td>
+                <td><span class="status-tag verified">🔗 On-Chain Verified</span></td>
+              </tr>
+              <tr>
                 <td>
-                  <div class="contribution-cell">
-                    <span class="contribution-value">82,104</span>
-                    <div class="contribution-bar"><div class="contribution-bar-fill" style="width:80%;"></div></div>
+                  <div><strong>Hospital 3 (Mayo Clinic Node)</strong></div>
+                  <div style="font-size:0.75rem;color:var(--text-dim);">EHR Partition train_3.csv</div>
+                </td>
+                <td><span style="color:var(--accent-green);">● ACTIVE</span></td>
+                <td><span class="mono" style="font-size:0.8rem;">0x90F79bf6EB2c4f870365E785982E1f101E93b906</span></td>
+                <td><code>5003</code></td>
+                <td><span class="status-tag verified">🔗 On-Chain Verified</span></td>
+              </tr>
+            </tbody>
+          </table>
                   </div>
                 </td>
                 <td><span class="status-tag verified">🔗 Blockchain Verified</span></td>

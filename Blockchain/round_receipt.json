@@ -1,42 +1,42 @@
 {
-  "round": 6,
-  "newRound": 7,
+  "round": 7,
+  "newRound": 8,
   "contractAddress": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
   "submissions": [
     {
       "hospital": 1,
       "address": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-      "txHash": "0x030c11d51884c46cff229f7259bdf95395c1d53775b5d3248c513b2bfdb0f993",
-      "blockNumber": 34,
+      "txHash": "0xeef434d038884e5f8e4327651aee439c5e0b0273e65e3f0cd7473e4561417e78",
+      "blockNumber": 38,
       "gasUsed": "243430",
-      "cid": "QmfGurKFsBDbFH9RnkzmkRDipsE1i3zF2gfG9wiaR8rnSX",
-      "hash": "0xfba179a00813ada8601c1918b10c35fe99d78f44ce8b712f49dfe20148d797f4"
+      "cid": "QmYEu3wHnr4qZTq18y7X6berrL4FmbYVf21tRUvG99mEaf",
+      "hash": "0x931b99d11e34d4e3baadd35726c5a7f5d4c206d138ad78b5849b7485e8edb814"
     },
     {
       "hospital": 2,
       "address": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-      "txHash": "0x8b37132268cd3e5eb1885ddd9bec047e66a9f82c110450408c4c48b7c4085ba4",
-      "blockNumber": 35,
+      "txHash": "0x3ecdae870909b2671a40c8b79604138b9b50679e3bd91373840010d3e9678612",
+      "blockNumber": 39,
       "gasUsed": "226330",
-      "cid": "QmePH3QFdw4DB9aud1AZFa5NVAR2qv61XJPHyTr1gJs955",
-      "hash": "0xee673be282220f2a9c8ca45d10aeca8780dc5bb490e37818be8e0c55bcd79bcc"
+      "cid": "QmWYY8ePFq7TifCugca6BrDP7yms2RtihAxAX5HFE7JuWP",
+      "hash": "0x79e90750a3459d94947f93990b01685156addb198f2b6094fe328eea3d2951a0"
     },
     {
       "hospital": 3,
       "address": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-      "txHash": "0x60abe22cc78e7670c100d8dfe132718b39f61639613994bfedc81b4b199bbeb6",
-      "blockNumber": 36,
+      "txHash": "0x7b8bcb1ebb813d6213797e0a5f263c742e5863e75aed2ef1de6bafe827b3e471",
+      "blockNumber": 40,
       "gasUsed": "226330",
-      "cid": "QmWKWezZCQ7Le94WsXBUwQV44G6cWTFvVywed8rnXsXaiF",
-      "hash": "0x7692ceeb279c7f7db822df83bf9d8bbfa90638437cfe7e731ac4ba0848aa704c"
+      "cid": "QmNbsopbtYb65dK2koSVtzsip2DdGqYyHdeRHhFpGeLwGo",
+      "hash": "0x03e685cf49249461c7cb896e1f75d7ea1afa66bad6d7e9f1735adfd96b098a94"
     }
   ],
   "globalModel": {
-    "cid": "QmWicx3dvCKEjXV64bQEt8g6x3Xb5aPx34gFfw2cDzosdx",
-    "hash": "0x7c7e48970d4b2dd3ecec4dcef027a2e9d31c884cc0bef7936bd49cb2aae2cfe7",
-    "txHash": "0x0edae299cd8dec35abfeb6e779a9f503e9db629c8b15238077859f4c81cf9c98",
-    "blockNumber": 37,
+    "cid": "QmbLfLkTWDS7Nipj72LvZxnrkXXPzEw2ARB5fXUS2bpy83",
+    "hash": "0xc128a4f78c5bdcbf437c13928cbcb019c5b16d5dd6af13ac02e15eb8a2d43250",
+    "txHash": "0xb668904081d060e1d37904e9c2e2150422885b39e56172607be90f1b7412b163",
+    "blockNumber": 41,
     "gasUsed": "174668"
   },
-  "timestamp": "2026-10-22T13:34:29.204Z"
+  "timestamp": "2026-10-22T14:03:50.529Z"
 }

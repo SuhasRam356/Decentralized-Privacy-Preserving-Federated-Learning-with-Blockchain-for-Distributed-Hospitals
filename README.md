@@ -114,7 +114,7 @@ This creates a fundamental bottleneck: **How can distributed medical centers col
                    |   - Verifies SHA-256 Hash         |
                    |   - Validates Registered Address  |
                    |   - Synchronizes Training Round   |
-                   |   - Emits RoundCompleted Event    |
+                   |   - Emits RoundAdvanced Event    |
                    +-----------------+-----------------+
                                      |
                                      v
@@ -267,20 +267,20 @@ sequenceDiagram
     participant D as Clinical Dashboard (Port 3000)
 
     Note over H,B: Training Round Start (Round t)
-    H->>H: 1. Train local MedCPT model on private EHR data
+    H->>H: 1. Train local MedCPT model on private clinical features
     H->>I: 2. Export state_dict (.pt) and upload to local IPFS daemon
-    I-->>H: Return IPFS CID (e.g. QmQhJou3...)
+    I-->>H: Return IPFS CID (e.g. QmfGurKFs...)
     H->>H: 3. Compute SHA-256 cryptographic digest of model weights
-    H->>B: 4. submitUpdate(round, cid, sha256, sampleCount, accuracy)
+    H->>B: 4. submitLocalModel(cid, sha256Hash)
     B->>B: 5. Verify sender registration, round validity, and CID format
     alt Required Submissions Reached (3/3)
-        B-->>A: Emit RoundCompleted(roundId, submissionCount)
+        B-->>A: Emit LocalModelSubmitted(round, hospital, cid)
         A->>I: 6. Fetch model weights via CIDs from IPFS
         A->>A: 7. Verify SHA-256 checksums against blockchain ledger
         A->>A: 8. Execute Federated Averaging (FedAvg) aggregation
         A->>I: 9. Pin new global model weights to IPFS Node 4
-        I-->>A: Return Global CID (Qmc2Lz2p...)
-        A->>B: 10. Record new global model CID and increment round
+        I-->>A: Return Global CID (QmWicx3dv...)
+        A->>B: 10. publishGlobalModel(cid, sha256Hash) -> advances currentRound
     end
     D->>B: Query on-chain audit ledger & node states
     D->>A: Fetch latest diagnostic metrics
@@ -393,9 +393,10 @@ contract ModelUpdateTracker {
     mapping(uint256 => mapping(address => bool)) public hasSubmitted;
     mapping(uint256 => ModelUpdate[]) public roundSubmissions;
 
-    event HospitalRegistered(address indexed hospital);
-    event UpdateSubmitted(uint256 indexed roundId, address indexed hospital, string ipfsCid);
-    event RoundCompleted(uint256 indexed roundId, uint256 submissionCount);
+    event HospitalRegistered(address hospital);
+    event LocalModelSubmitted(uint256 round, address hospital, string cid);
+    event GlobalModelPublished(uint256 round, string cid);
+    event RoundAdvanced(uint256 newRound);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only orchestrator can call");
@@ -413,7 +414,7 @@ contract ModelUpdateTracker {
 
 1. **Authorization**: Only pre-registered hospital addresses (`onlyRegistered`) can submit updates.
 2. **Replay Protection**: `hasSubmitted[roundId][msg.sender]` prevents double-spending or submitting multiple conflicting gradients in the same round.
-3. **Automated Consensus**: When `roundSubmissions[currentRound].length == requiredSubmissions`, the contract emits `RoundCompleted`, signaling the aggregator to compute the global model.
+3. **Automated Consensus**: When `roundHospitals[currentRound].length >= requiredSubmissions`, the aggregator executes FedAvg and invokes `publishGlobalModel()`, emitting `GlobalModelPublished` and advancing to the next round via `RoundAdvanced`.
 
 ---
 
@@ -502,20 +503,20 @@ The web dashboard was completely re-engineered from an ad-hoc dark prototype int
 |  MedXChAIn                                     🔍 [Search hospitals or models...]  v4.2.1  [🔄] [🔗] [Export]|
 |  [👩‍⚕️ Dr. Seham Hakim | Doctor]                                                                       |
 +---------------------+---------------------------------------------------------------------------------+
-|  [📊 Overview]      |  14 Hospitals Connected    1.2k Updates    v4.2.1 Global Model    ● ACTIVE      |
+|  [📊 Overview]      |  3 Hospitals Connected    18 Updates    Round 6 Global Model    ● ACTIVE        |
 |  [📋 Anamnesis]     |  +-------------------------------------+  +----------------------------------+  |
 |  [🩺 Diagnosis]     |  | Federated Model Performance Chart   |  | Hospital Participation           |  |
 |  [⚙️ Models]        |  | [Accuracy] [F1-Score]               |  | - St. Jude Memorial (35%)        |  |
-|  [🏥 Hospitals]     |  | ~~~ 89.4% Converged Accuracy ~~~    |  | - Johns Hopkins Center (34%)     |  |
+|  [🏥 Hospitals]     |  | ~~~ On-Chain Consensus Convergence~ |  | - Johns Hopkins Center (34%)     |  |
 |  [🔐 Security]      |  +-------------------------------------+  | - Mayo Clinic Research (31%)     |  |
 |                     |                                           +----------------------------------+  |
 |  ● FL Active        |  Active Learning Sessions                 Global Node Distribution Map          |
-|  Syncing 14 nodes   |  - Session #8942 · Syncing                - Europe (6) · NA (5) · Asia (3)      |
+|  Syncing 3 nodes    |  - Session #8942 · Syncing                - Hospital 1 (5001) · H2 (5002) · H3  |
 +---------------------+---------------------------------------------------------------------------------+
 ```
 
 ### View 1: Overview Dashboard
-- **Live Metric Cards**: Connected Hospitals (14), Total Model Updates (1.2k), Global Model Version (`v4.2.1`), and Active System Status.
+- **Live Metric Cards**: Connected Hospitals (3), Total Model Updates (18), Global Model Round (6), and Active EVM/IPFS Status.
 - **Performance Curve Canvas**: Interactive dual-mode chart plotting Accuracy and F1-Scores across 12 training epochs.
 - **Participation Split**: Real-time progress bars indicating gradient volume contributions per medical center.
 - **Distribution Map & Live Sessions**: Visual geographic layout of participating healthcare nodes and current streaming sync sessions.
@@ -709,8 +710,8 @@ python run_federated_pipeline.py
 
 --- PHASE 3: Clinical Diagnosis Evaluation ---
    Test Symptoms: 'patient presents with acute tachycardia, irregular pulse, and mild dyspnea'
-   Top Predicted Diagnosis: Cardiac Arrhythmia (Confidence: 89.4%)
-✅ PIPELINE COMPLETE: Federated Round 1 successfully finalized on blockchain!
+   Top Predicted Diagnosis: Cardiac Arrhythmia (Verified Posterior Probability)
+✅ PIPELINE COMPLETE: Federated Round executed and finalized on blockchain!
 ```
 
 ### Step 6: Launch and Interact with the Web Dashboard
@@ -731,28 +732,31 @@ Open your browser to:
 The dashboard backend exposes standard REST endpoints:
 
 ### `GET /api/status`
-Returns current federated learning round state, participating hospitals, and blockchain contract metadata.
+Returns live system health, on-chain round status, verified CIDs, and authorized hospital nodes.
 
 - **Response `200 OK`**:
 ```json
 {
-  "currentRound": 2,
-  "requiredSubmissions": 3,
-  "globalAccuracy": 89.4,
-  "totalSamples": 186000,
-  "hospitals": [
-    {
-      "id": 1,
-      "name": "St. Jude Memorial Hospital",
-      "address": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-      "status": "Online",
-      "samples": 62000,
-      "loss": 0.042,
-      "accuracy": 88.6,
-      "cid": "QmQhJou3ciXKMCXn1YZPNQrKPkGthZbPpmYa5t8Paxf9E5"
-    },
-    {
-      "id": 2,
+  "sources": {
+    "chain": "ok",
+    "ipfs": "ok",
+    "model": "ok"
+  },
+  "round": {
+    "currentRound": 6,
+    "requiredSubmissions": 3,
+    "contractAddress": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+    "latestBlock": 33,
+    "globalCid": "QmWicx3dvCKEjXV64bQEt8g6x3Xb5aPx34gFfw2cDzosdx",
+    "globalTx": "0x2fadaec12fe2e7da82a642349841ea01542655d84f13dbcbd4ca2690c7a352a1",
+    "submissions": [...]
+  },
+  "model": {
+    "architecture": "MedCPTClassifier (768 -> 512 -> 793)",
+    "verified_classes": 793
+  },
+  "hospitals": [...]
+}
       "name": "Johns Hopkins Medical Center",
       "address": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
       "status": "Online",
@@ -805,10 +809,10 @@ Advances the federated learning round on-chain, re-aggregating hospital updates 
 ```json
 {
   "success": true,
-  "message": "Advanced to round 3",
+  "message": "Round completed on-chain",
   "state": {
-    "currentRound": 3,
-    "globalAccuracy": 90.6
+    "currentRound": 6,
+    "onchainVerified": true
   }
 }
 ```
@@ -823,19 +827,17 @@ Returns the complete 793-class disease index mapping.
 Key functions exposed by `ModelUpdateTracker.sol`:
 
 ```solidity
-function registerHospital(address _hospital) external;
-function submitUpdate(
-    uint256 _roundId,
-    string memory _ipfsCid,
-    string memory _sha256Hash,
-    uint256 _sampleCount,
-    uint256 _accuracyScore
-) external;
-function getRoundSubmissions(uint256 _roundId) external view returns (ModelUpdate[] memory);
-function getRoundStatus(uint256 _roundId) external view returns (bool isComplete, uint256 submissionCount);
+function registerHospital(address _hospital) external onlyOwner;
+function revokeHospital(address _hospital) external onlyOwner;
+function submitLocalModel(string calldata _cid, bytes32 _fileHash) external onlyHospital;
+function publishGlobalModel(string calldata _cid, bytes32 _fileHash) external onlyAggregator;
+function getLocalModel(uint256 _round, address _hospital) external view returns (ModelPointer memory);
+function getGlobalModel(uint256 _round) external view returns (ModelPointer memory);
+function getRoundHospitals(uint256 _round) external view returns (address[] memory);
+function currentRound() external view returns (uint256);
 ```
 
-To invoke `submitUpdate` directly using `curl` and Ethereum JSON-RPC:
+To invoke `submitLocalModel` directly using `curl` and Ethereum JSON-RPC:
 
 ```bash
 curl -X POST http://127.0.0.1:8545 \
@@ -845,7 +847,7 @@ curl -X POST http://127.0.0.1:8545 \
     "method":"eth_sendTransaction",
     "params":[{
       "from":"0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-      "to":"0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "to":"0x0165878A594ca255338adfa4d48449f69242Eb8F",
       "data":"0x..."
     }],
     "id":1
@@ -858,7 +860,7 @@ curl -X POST http://127.0.0.1:8545 \
 
 | Threat Vector | Potential Impact | MedXChAIn Defense Mechanism |
 | :--- | :--- | :--- |
-| **Data Poisoning / Sybil Attack** | Malicious node injects poisoned gradients to degrade accuracy | Smart contract `onlyRegistered` whitelist; reputation scoring in `ModelRegistry2.sol` |
+| **Data Poisoning / Sybil Attack** | Malicious node injects poisoned gradients to degrade accuracy | Smart contract `onlyHospital` whitelist; authorization verification in `ModelUpdateTracker.sol` |
 | **Model Inversion Attack** | Adversary attempts to reconstruct EHR images from weights | Local DP-SGD (Differential Privacy with gradient clipping and Gaussian noise) |
 | **Man-in-the-Middle (MitM)** | Attacker intercepts and replaces IPFS model weights | On-chain SHA-256 digest validation: if downloaded bytes don't match the smart contract digest, the update is rejected |
 | **Double-Submission Replay** | Hospital submits multiple gradients to bias FedAvg weights | On-chain mapping `hasSubmitted[roundId][msg.sender]` prevents multiple submissions per round |

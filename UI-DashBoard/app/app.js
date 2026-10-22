@@ -44,8 +44,64 @@ document.addEventListener("DOMContentLoaded", () => {
     const curRound = (state.round && state.round.currentRound) || 1;
     const verValues = document.querySelectorAll(".topbar-version .ver-value, .sbc-value");
     verValues.forEach(el => {
-      el.textContent = `v4.2.${curRound}`;
+      el.textContent = `Round ${curRound}`;
     });
+
+    // Update Overview metrics cards dynamically
+    const hVal = document.getElementById("metric-hospitals-val");
+    if (hVal && state.hospitals) {
+      hVal.innerHTML = `${state.hospitals.length} <span class="metric-badge green">Authorized Nodes</span>`;
+    }
+
+    const uVal = document.getElementById("metric-updates-val");
+    const uSub = document.getElementById("metric-updates-sub");
+    if (uVal) {
+      const totalUpdates = (curRound - 1) * 3 + (state.round.submissions ? state.round.submissions.length : 0);
+      uVal.textContent = `${totalUpdates} Submissions`;
+      if (uSub) uSub.textContent = `${curRound} Federated Rounds`;
+    }
+
+    const rVal = document.getElementById("metric-round-val");
+    if (rVal) {
+      rVal.innerHTML = `Round ${curRound} <span class="metric-badge blue">Live On-Chain</span>`;
+    }
+
+    const sVal = document.getElementById("metric-status-val");
+    const sSub = document.getElementById("metric-status-sub");
+    if (sVal && state.sources) {
+      const isOk = state.sources.chain === "ok" && state.sources.ipfs === "ok";
+      sVal.textContent = isOk ? "ACTIVE" : "DEGRADED";
+      sVal.style.color = isOk ? "var(--accent-green)" : "#f59e0b";
+      if (sSub) {
+        sSub.textContent = `● Chain: ${state.sources.chain} | IPFS: ${state.sources.ipfs}`;
+        sSub.style.color = isOk ? "var(--accent-green)" : "#f59e0b";
+      }
+    }
+
+    // Update Model Profile
+    const archName = document.getElementById("model-arch-name");
+    if (archName && state.model && state.model.architecture) {
+      archName.textContent = state.model.architecture;
+    }
+    const epochsVal = document.getElementById("model-epochs-val");
+    if (epochsVal) {
+      epochsVal.textContent = `Round ${curRound} (EVM Block #${state.round.latestBlock || 0})`;
+    }
+
+    // Update Hospital Tab stats
+    const hospActive = document.getElementById("hosp-active-nodes");
+    if (hospActive && state.hospitals) {
+      hospActive.innerHTML = `${state.hospitals.length} <span class="hs-change">Authorized Nodes</span>`;
+    }
+    const hospContrib = document.getElementById("hosp-total-contrib");
+    if (hospContrib) {
+      const totalUpdates = (curRound - 1) * 3 + (state.round.submissions ? state.round.submissions.length : 0);
+      hospContrib.innerHTML = `${totalUpdates} <span class="hs-sub">on-chain updates</span>`;
+    }
+    const hospSync = document.getElementById("hosp-sync-status");
+    if (hospSync) {
+      hospSync.textContent = `EVM Block #${state.round.latestBlock || 'Synced'}`;
+    }
 
     // Update global CID if IPFS refs exist
     const cidRef = document.querySelector(".ipfs-ref-item .ref-value");

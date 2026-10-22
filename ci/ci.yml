@@ -1,0 +1,52 @@
+name: MedXChAIn CI
+
+on:
+  push:
+    branches: [ main, "feat/**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  smart-contracts:
+    name: Blockchain Smart Contracts Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: Blockchain/package-lock.json
+
+      - name: Install Blockchain Dependencies
+        run: |
+          cd Blockchain
+          npm ci
+
+      - name: Run Hardhat Unit Tests (19 tests)
+        run: |
+          cd Blockchain
+          npx hardhat test
+
+  python-pipeline:
+    name: Pipeline & Clinical Guardrails
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest
+
+      - name: Verify Provenance & Integrity Tests
+        run: |
+          pytest -q tests/
