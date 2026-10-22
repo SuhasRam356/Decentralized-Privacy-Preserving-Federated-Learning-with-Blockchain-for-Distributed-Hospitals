@@ -2,11 +2,6 @@ node_modules/
 cache/
 artifacts/
 typechain-types/
-IMPROVEMENTS_EXPLAINED.md
-IPFS_BLOCKCHAIN_INTEGRATION_GUIDE.md
-QUICK_START.md
-requirements.txt
-Blockchain/STEP_BY_STEP_GUIDE.md
 
 # Hardhat files
 coverage/

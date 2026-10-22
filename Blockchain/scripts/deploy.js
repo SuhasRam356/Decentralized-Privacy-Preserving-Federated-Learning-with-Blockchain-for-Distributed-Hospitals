@@ -21,13 +21,27 @@ async function main() {
 
   console.log("✅ Contract deployed");
   console.log("📍 Address:", address);
-  console.log("👤 Owner / Aggregator:", owner);
   console.log("🔢 Current round:", round.toString());
+
+  const signers = await hre.ethers.getSigners();
+  const hospitalAddresses = [
+    signers[1].address,
+    signers[2].address,
+    signers[3].address
+  ];
+
+  console.log("🏥 Registering default test hospital nodes...");
+  for (let i = 0; i < hospitalAddresses.length; i++) {
+    const tx = await contract.registerHospital(hospitalAddresses[i]);
+    await tx.wait();
+    console.log(`   ✓ Hospital ${i + 1} registered: ${hospitalAddresses[i]}`);
+  }
 
   const info = {
     address,
     owner,
     requiredSubmissions: REQUIRED_SUBMISSIONS,
+    hospitals: hospitalAddresses,
     network: hre.network.name,
     deployedAt: new Date().toISOString()
   };

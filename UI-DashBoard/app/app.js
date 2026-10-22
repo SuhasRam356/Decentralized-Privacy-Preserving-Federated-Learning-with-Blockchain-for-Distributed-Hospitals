@@ -39,17 +39,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateBadges(state) {
     if (!state) return;
+
     // Update global version & round
+    const curRound = (state.round && state.round.currentRound) || 1;
     const verValues = document.querySelectorAll(".topbar-version .ver-value, .sbc-value");
     verValues.forEach(el => {
-      el.textContent = `v4.2.${state.currentRound || 1}`;
+      el.textContent = `v4.2.${curRound}`;
     });
 
     // Update global CID if IPFS refs exist
     const cidRef = document.querySelector(".ipfs-ref-item .ref-value");
-    if (cidRef && state.globalModelCid) {
-      cidRef.textContent = state.globalModelCid.slice(0, 8) + "..." + state.globalModelCid.slice(-6);
-      cidRef.title = state.globalModelCid;
+    if (cidRef && state.round && state.round.globalCid) {
+      cidRef.textContent = state.round.globalCid.slice(0, 8) + "..." + state.round.globalCid.slice(-6);
+      cidRef.title = state.round.globalCid;
+    }
+
+    // Render live ledger rows if present
+    const ledgerTbody = document.getElementById("ledger-tbody");
+    if (ledgerTbody && state.round && state.round.submissions && state.round.submissions.length > 0) {
+      ledgerTbody.innerHTML = "";
+      state.round.submissions.forEach((sub) => {
+        const tr = document.createElement("tr");
+        const shortHash = sub.hash ? (sub.hash.slice(0, 10) + "..." + sub.hash.slice(-8)) : "0x...";
+        const shortTx = sub.txHash ? (sub.txHash.slice(0, 10) + "...") : "Confirmed";
+        const hospitalName = sub.hospital === 1 ? "St. Jude Node" : (sub.hospital === 2 ? "Johns Hopkins Node" : "Mayo Clinic Node");
+        const badgeClass = sub.hospital === 1 ? "mh" : (sub.hospital === 2 ? "jh" : "cc");
+        const badgeText = sub.hospital === 1 ? "SJ" : (sub.hospital === 2 ? "JH" : "MC");
+        tr.innerHTML = `
+          <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="mono" title="${sub.hash}" style="font-size:0.78rem;">${shortHash}</span></td>
+          <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="node-badge ${badgeClass}" style="width:24px;height:24px;font-size:0.6rem;">${badgeText}</span> ${hospitalName}</td>
+          <td style="padding:12px;border-bottom:1px solid var(--border-light);">${new Date().toISOString().slice(0, 10)}<br><span style="color:var(--text-dim);font-size:0.75rem;">${shortTx}</span></td>
+          <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="status-tag committed">On-Chain Verified</span></td>
+        `;
+        ledgerTbody.appendChild(tr);
+      });
     }
   }
 
@@ -84,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (btnDiagnose) {
       btnDiagnose.disabled = true;
-      btnDiagnose.innerHTML = "<span>⏳</span><span>Analyzing with MedCPT...</span>";
+      btnDiagnose.innerHTML = "<span>⏳</span><span>Analyzing Symptoms...</span>";
     }
 
     try {
@@ -94,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ symptoms: text })
       });
       const data = await res.json();
-      renderDiagnosis(data.results);
+      renderDiagnosis(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -105,34 +128,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function renderDiagnosis(results) {
+  function renderDiagnosis(data) {
     if (!resultsList) return;
     resultsList.innerHTML = "";
 
-    const notes = [
-      "🧩 Pattern matches 43 cases in global network",
-      "🕐 Matches typical secondary diagnosis pattern",
-      "📊 Low confidence — consider additional testing",
-      "🔬 Rare condition — flagged for specialist review",
-      "🏥 Cross-validated with 3 hospital datasets"
-    ];
+    if (!data) return;
 
-    results.forEach((r, idx) => {
-      const opacity = r.confidence < 20 ? "opacity: 0.6;" : "";
+    // Render Urgent Care Alert if flagged
+    if (data.urgent_care_alert) {
+      const alertDiv = document.createElement("div");
+      alertDiv.className = "diag-alert-banner";
+      alertDiv.style.cssText = "background:#fee2e2;border:1px solid #f87171;color:#b91c1c;padding:10px 14px;border-radius:var(--radius-md);margin-bottom:12px;font-size:0.8rem;font-weight:600;";
+      alertDiv.innerHTML = `🚨 ${data.urgent_care_alert}`;
+      resultsList.appendChild(alertDiv);
+    }
+
+    const differentials = (data.evidence && data.evidence.top_differentials) || [];
+    if (differentials.length === 0) {
+      const emptyDiv = document.createElement("div");
+      emptyDiv.style.cssText = "padding:16px;text-align:center;color:var(--text-dim);font-size:0.85rem;";
+      emptyDiv.textContent = "No direct ontology matches found. Please specify additional clinical symptoms.";
+      resultsList.appendChild(emptyDiv);
+      return;
+    }
+
+    differentials.forEach((r, idx) => {
       const div = document.createElement("div");
       div.className = "diag-result-item";
-      div.style.cssText = opacity;
       div.innerHTML = `
         <div class="diag-result-top">
           <span class="diag-disease-name">${r.disease}</span>
-          <span class="diag-confidence">${r.confidence}%</span>
+          <span class="status-tag verified" style="font-size:0.7rem;">Ontology Match</span>
         </div>
-        <div class="diag-score-label">Confidence Score</div>
-        <div class="diag-bar-track"><div class="diag-bar-fill" style="width:${r.confidence}%;"></div></div>
-        ${idx < 2 ? `<div class="diag-note">${notes[idx] || notes[0]}</div>` : ""}
+        <div class="diag-score-label">Relevance Indicators: ${r.match_score} term match(es)</div>
+        <div class="diag-bar-track"><div class="diag-bar-fill" style="width:${Math.min(100, r.match_score * 35)}%;"></div></div>
+        <div class="diag-note" style="margin-top:6px;font-size:0.75rem;color:var(--text-dim);">🔬 Matched in 793-disease clinical ontology</div>
       `;
       resultsList.appendChild(div);
     });
+
+    if (data.disclaimer) {
+      const disc = document.createElement("div");
+      disc.style.cssText = "margin-top:12px;font-size:0.7rem;color:var(--text-muted);font-style:italic;";
+      disc.textContent = `ℹ️ ${data.disclaimer}`;
+      resultsList.appendChild(disc);
+    }
   }
 
   // =============================================

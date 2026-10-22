@@ -99,5 +99,68 @@ describe("ModelUpdateTracker & Federated Learning Lifecycle", function () {
     const globalModelInfo = await tracker.getGlobalModel(1);
     expect(globalModelInfo.cid).to.equal(globalCid);
     expect(globalModelInfo.fileHash).to.equal(globalHash);
+
+    // Cannot re-publish global model for same round
+    await expect(
+      tracker.connect(owner).publishGlobalModel(globalCid, globalHash)
+    ).to.be.revertedWith("Not enough hospitals");
+  });
+
+  it("Should revert on constructor with quorum = 0", async function () {
+    const ModelUpdateTracker = await hre.ethers.getContractFactory("ModelUpdateTracker");
+    await expect(ModelUpdateTracker.deploy(0)).to.be.revertedWith("quorum=0");
+  });
+
+  it("Should reject empty CID and zero hash on submitLocalModel", async function () {
+    await tracker.registerHospital(hospital1.address);
+    const validHash = hre.ethers.keccak256(hre.ethers.toUtf8Bytes("weights"));
+    const zeroHash = hre.ethers.ZeroHash;
+
+    await expect(
+      tracker.connect(hospital1).submitLocalModel("", validHash)
+    ).to.be.revertedWith("empty cid");
+
+    await expect(
+      tracker.connect(hospital1).submitLocalModel("QmValidCid", zeroHash)
+    ).to.be.revertedWith("empty hash");
+  });
+
+  it("Should reject zero address on setAggregator and emit AggregatorChanged", async function () {
+    await expect(
+      tracker.connect(owner).setAggregator(hre.ethers.ZeroAddress)
+    ).to.be.revertedWith("zero addr");
+
+    await expect(tracker.connect(owner).setAggregator(hospital1.address))
+      .to.emit(tracker, "AggregatorChanged")
+      .withArgs(owner.address, hospital1.address);
+  });
+
+  it("Should allow updating quorum and emit QuorumChanged", async function () {
+    await expect(
+      tracker.connect(owner).setRequiredSubmissions(0)
+    ).to.be.revertedWith("quorum=0");
+
+    await expect(tracker.connect(owner).setRequiredSubmissions(5))
+      .to.emit(tracker, "QuorumChanged")
+      .withArgs(REQUIRED_SUBMISSIONS, 5);
+
+    expect(await tracker.requiredSubmissions()).to.equal(5);
+  });
+
+  it("Should revoke a hospital and prevent further submissions", async function () {
+    await tracker.registerHospital(hospital1.address);
+    expect((await tracker.hospitalContributions(hospital1.address)).isRegistered).to.be.true;
+
+    await expect(tracker.connect(owner).revokeHospital(hospital1.address))
+      .to.emit(tracker, "HospitalRevoked")
+      .withArgs(hospital1.address);
+
+    expect((await tracker.hospitalContributions(hospital1.address)).isRegistered).to.be.false;
+
+    const dummyCid = "QmTestHospitalLocalModel1";
+    const dummyHash = hre.ethers.keccak256(hre.ethers.toUtf8Bytes("model_bytes_1"));
+    await expect(
+      tracker.connect(hospital1).submitLocalModel(dummyCid, dummyHash)
+    ).to.be.revertedWith("Not hospital");
   });
 });

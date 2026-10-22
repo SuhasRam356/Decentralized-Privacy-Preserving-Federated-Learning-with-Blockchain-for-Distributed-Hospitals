@@ -1,0 +1,34 @@
+{
+  "round": 2,
+  "newRound": 3,
+  "contractAddress": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+  "submissions": [
+    {
+      "hospital": 1,
+      "address": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "txHash": "0x7c1e24afb9f86403fe440cddaac6afb4f854e617945a48b570bf2114119e4b79",
+      "cid": "QmfGurKFsBDbFH9RnkzmkRDipsE1i3zF2gfG9wiaR8rnSX",
+      "hash": "0xfba179a00813ada8601c1918b10c35fe99d78f44ce8b712f49dfe20148d797f4"
+    },
+    {
+      "hospital": 2,
+      "address": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "txHash": "0xca43c1f2ccfe82bc60172499dc301cdfa667a6700eca1c3202d9f2a36fc036a6",
+      "cid": "QmePH3QFdw4DB9aud1AZFa5NVAR2qv61XJPHyTr1gJs955",
+      "hash": "0xee673be282220f2a9c8ca45d10aeca8780dc5bb490e37818be8e0c55bcd79bcc"
+    },
+    {
+      "hospital": 3,
+      "address": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+      "txHash": "0xc5eeb7c7e3851d0370731b6adc41bbbce6f858857818b18c68ca8ddc5f56e1c5",
+      "cid": "QmWKWezZCQ7Le94WsXBUwQV44G6cWTFvVywed8rnXsXaiF",
+      "hash": "0x7692ceeb279c7f7db822df83bf9d8bbfa90638437cfe7e731ac4ba0848aa704c"
+    }
+  ],
+  "globalModel": {
+    "cid": "QmWicx3dvCKEjXV64bQEt8g6x3Xb5aPx34gFfw2cDzosdx",
+    "hash": "0x7c7e48970d4b2dd3ecec4dcef027a2e9d31c884cc0bef7936bd49cb2aae2cfe7",
+    "txHash": "0xd989f9055811cbcd84a341d318df653ddc7c735c58f893a862b31a38c24a0058"
+  },
+  "timestamp": "2026-10-22T07:49:41.783Z"
+}

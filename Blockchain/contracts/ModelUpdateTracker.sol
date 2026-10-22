@@ -45,6 +45,9 @@ contract ModelUpdateTracker {
 
     // ---------------- EVENTS ----------------
     event HospitalRegistered(address hospital);
+    event HospitalRevoked(address indexed hospital);
+    event AggregatorChanged(address indexed oldAggregator, address indexed newAggregator);
+    event QuorumChanged(uint256 oldQuorum, uint256 newQuorum);
     event LocalModelSubmitted(uint256 round, address hospital, string cid);
     event GlobalModelPublished(uint256 round, string cid);
     event RoundAdvanced(uint256 newRound);
@@ -72,6 +75,7 @@ contract ModelUpdateTracker {
 
     // ---------------- CONSTRUCTOR ----------------
     constructor(uint256 _requiredSubmissions) {
+        require(_requiredSubmissions > 0, "quorum=0");
         owner = msg.sender;
         aggregator = msg.sender;
         requiredSubmissions = _requiredSubmissions;
@@ -79,7 +83,8 @@ contract ModelUpdateTracker {
     }
 
     // ---------------- ADMIN ----------------
-    function registerHospital(address h) external onlyOwner {
+    function registerHospital(address h) external onlyOwner whenNotPaused {
+        require(h != address(0), "zero addr");
         require(!hospitalContributions[h].isRegistered, "Already registered");
 
         hospitalContributions[h] = HospitalContribution({
@@ -92,7 +97,21 @@ contract ModelUpdateTracker {
         emit HospitalRegistered(h);
     }
 
+    function revokeHospital(address h) external onlyOwner {
+        require(hospitalContributions[h].isRegistered, "Not registered");
+        hospitalContributions[h].isRegistered = false;
+        emit HospitalRevoked(h);
+    }
+
+    function setRequiredSubmissions(uint256 n) external onlyOwner {
+        require(n > 0, "quorum=0");
+        emit QuorumChanged(requiredSubmissions, n);
+        requiredSubmissions = n;
+    }
+
     function setAggregator(address a) external onlyOwner {
+        require(a != address(0), "zero addr");
+        emit AggregatorChanged(aggregator, a);
         aggregator = a;
     }
 
@@ -113,6 +132,8 @@ contract ModelUpdateTracker {
         onlyHospital
         whenNotPaused
     {
+        require(bytes(cid).length > 0, "empty cid");
+        require(fileHash != bytes32(0), "empty hash");
         require(!hasSubmitted[currentRound][msg.sender], "Already submitted");
 
         localModels[currentRound][msg.sender] = ModelPointer({
@@ -140,6 +161,9 @@ contract ModelUpdateTracker {
         onlyAggregator
         whenNotPaused
     {
+        require(bytes(cid).length > 0, "empty cid");
+        require(fileHash != bytes32(0), "empty hash");
+        require(bytes(globalModels[currentRound].cid).length == 0, "already published");
         require(
             roundHospitals[currentRound].length >= requiredSubmissions,
             "Not enough hospitals"

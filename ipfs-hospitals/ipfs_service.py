@@ -36,14 +36,19 @@ def calculate_cidv0(data: bytes) -> str:
     multihash = b'\x12\x20' + sha
     return base58_encode(multihash)
 
-STORAGE_DIR = os.path.join(os.path.dirname(__file__), "storage")
-os.makedirs(STORAGE_DIR, exist_ok=True)
+STORAGE_BASE_DIR = os.path.join(os.path.dirname(__file__), "storage")
+os.makedirs(STORAGE_BASE_DIR, exist_ok=True)
 
 class IPFSNodeHandler(BaseHTTPRequestHandler):
     node_name = "IPFS Node"
 
+    @property
+    def node_storage_dir(self):
+        dir_path = os.path.join(STORAGE_BASE_DIR, f"node_{self.server.server_port}")
+        os.makedirs(dir_path, exist_ok=True)
+        return dir_path
+
     def log_message(self, format, *args):
-        # Keep quiet on standard requests unless debugging
         pass
 
     def do_POST(self):
@@ -51,7 +56,7 @@ class IPFSNodeHandler(BaseHTTPRequestHandler):
         path = parsed.path
         query = parse_qs(parsed.query)
 
-        if path.endswith("/version"):
+        if path in ("/api/v0/version", "/version"):
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
@@ -64,11 +69,10 @@ class IPFSNodeHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(resp).encode())
             return
 
-        elif path.endswith("/id"):
+        elif path in ("/api/v0/id", "/id"):
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            # Standard ed25519 peer ID representation
             peer_ids = {
                 5001: "12D3KooWEyoppPywJqodgvPnRoCvLqdvdKvgjW3KovBwKkjmX4hF",
                 5002: "12D3KooWDiB3N9t5u3qS1w6u1UjH2uP8dC5jQ7fM4sL9vR1bN2kL",
@@ -86,15 +90,26 @@ class IPFSNodeHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(resp).encode())
             return
 
-        elif path.endswith("/add"):
+        elif path in ("/api/v0/add", "/add"):
             length = int(self.headers.get("Content-Length", 0))
-            body = self.rfile.read(length) if length > 0 else b""
-            
-            # Simple multipart extraction or raw payload
-            cid = calculate_cidv0(body)
-            cid_file = os.path.join(STORAGE_DIR, cid)
+            raw_body = self.rfile.read(length) if length > 0 else b""
+            content_type = self.headers.get("Content-Type", "")
+
+            # Extract binary file content from multipart/form-data if present
+            file_bytes = raw_body
+            if "multipart/form-data" in content_type and b"\r\n\r\n" in raw_body:
+                header_end = raw_body.find(b"\r\n\r\n")
+                if header_end != -1:
+                    boundary_idx = raw_body.rfind(b"\r\n--")
+                    if boundary_idx > header_end:
+                        file_bytes = raw_body[header_end + 4 : boundary_idx]
+                    else:
+                        file_bytes = raw_body[header_end + 4 :]
+
+            cid = calculate_cidv0(file_bytes)
+            cid_file = os.path.join(self.node_storage_dir, cid)
             with open(cid_file, "wb") as f:
-                f.write(body)
+                f.write(file_bytes)
 
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -102,16 +117,16 @@ class IPFSNodeHandler(BaseHTTPRequestHandler):
             resp = {
                 "Name": cid,
                 "Hash": cid,
-                "Size": str(len(body))
+                "Size": str(len(file_bytes))
             }
             self.wfile.write((json.dumps(resp) + "\n").encode())
             return
 
-        elif path.endswith("/cat"):
+        elif path in ("/api/v0/cat", "/cat") or path.startswith("/api/v0/cat/"):
             arg = query.get("arg", [""])[0]
             if not arg and len(path.split("/")) > 4:
                 arg = path.split("/")[-1]
-            cid_file = os.path.join(STORAGE_DIR, arg)
+            cid_file = os.path.join(self.node_storage_dir, arg)
             if os.path.exists(cid_file):
                 with open(cid_file, "rb") as f:
                     data = f.read()
@@ -124,7 +139,8 @@ class IPFSNodeHandler(BaseHTTPRequestHandler):
                 self.end_headers()
             return
 
-        self.send_response(200)
+        # Unknown route fails closed
+        self.send_response(404)
         self.end_headers()
 
     def do_GET(self):
