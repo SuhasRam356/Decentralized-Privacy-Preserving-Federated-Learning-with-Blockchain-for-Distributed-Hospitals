@@ -62,10 +62,10 @@
       <!-- Sidebar Bottom -->
       <div class="sidebar-status">
         <div class="status-indicator-box">
-          <div class="indicator-dot online"></div>
+          <div class="indicator-dot online" id="sidebar-indicator-dot"></div>
           <div>
-            <div class="status-label">Federated Learning Active</div>
-            <div class="status-detail">System syncing across 14 secure hospital nodes.</div>
+            <div class="status-label" id="sidebar-status-label">Federated Learning Active</div>
+            <div class="status-detail" id="sidebar-sync-detail">System syncing across 3 decentralized hospital nodes.</div>
           </div>
         </div>
       </div>
@@ -468,16 +468,16 @@
                 <span class="production-badge">Federated Consensus</span>
               </div>
               <div class="arch-label">Architecture</div>
-              <div class="arch-value" id="model-arch-name">MedCPTClassifier (NCBI Semantic Hash)</div>
+              <div class="arch-value" id="model-arch-name">MedCPTClassifier (768 -> 256 -> 793)</div>
 
               <div class="model-stats">
                 <div class="model-stat-item">
                   <div class="ms-label">Total Parameters</div>
-                  <div class="ms-value" id="model-total-params">~203K</div>
+                  <div class="ms-value" id="model-total-params">400,657 (401K)</div>
                 </div>
                 <div class="model-stat-item">
                   <div class="ms-label">Training Rounds</div>
-                  <div class="ms-value" id="model-epochs-val">Round 6 (EVM Verified)</div>
+                  <div class="ms-value" id="model-epochs-val">Round 1 (EVM Verified)</div>
                 </div>
               </div>
 
@@ -665,51 +665,6 @@
               </tr>
             </tbody>
           </table>
-                  </div>
-                </td>
-                <td><span class="status-tag verified">🔗 Blockchain Verified</span></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>
-                  <div><strong>Berlin G.Hospital</strong></div>
-                  <div style="font-size:0.75rem;color:var(--text-dim);">Berlin, GER · Node #3310</div>
-                </td>
-                <td><span style="color:var(--accent-red);">● INACTIVE</span></td>
-                <td>
-                  <div class="contribution-cell">
-                    <span class="contribution-value">0</span>
-                    <div class="contribution-bar"><div class="contribution-bar-fill" style="width:0%;"></div></div>
-                  </div>
-                </td>
-                <td><span class="status-tag flagged">⚠ Verification Pending</span></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>
-                  <div><strong>Singapore Hospital</strong></div>
-                  <div style="font-size:0.75rem;color:var(--text-dim);">Singapore · Node #1209</div>
-                </td>
-                <td><span style="color:var(--accent-green);">● ACTIVE</span></td>
-                <td>
-                  <div class="contribution-cell">
-                    <span class="contribution-value">45,291</span>
-                    <div class="contribution-bar"><div class="contribution-bar-fill" style="width:55%;"></div></div>
-                  </div>
-                </td>
-                <td><span class="status-tag verified">🔗 Blockchain Verified</span></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="pagination">
-            <span class="info">Showing 4 of 124 hospitals</span>
-            <button>‹</button>
-            <button class="active">1</button>
-            <button>2</button>
-            <button>3</button>
-            <button>›</button>
-          </div>
 
           <!-- Bottom Cards -->
           <div class="bottom-cards">

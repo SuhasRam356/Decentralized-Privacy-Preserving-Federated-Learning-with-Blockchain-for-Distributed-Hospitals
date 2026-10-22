@@ -21,25 +21,39 @@ async function main() {
   const hospitalSigners = [signers[1], signers[2], signers[3]];
 
   const round = await contract.currentRound();
-  console.log(`⛓️  Current on-chain round: ${round}`);
+  const requiredSubmissions = await contract.requiredSubmissions();
+  const activeCount = await contract.activeHospitalCount();
 
-  // Ensure hospital signers are registered
-  for (let i = 0; i < hospitalSigners.length; i++) {
-    const s = hospitalSigners[i];
-    const contrib = await contract.hospitalContributions(s.address);
-    if (!contrib.isRegistered) {
-      console.log(`📝 Registering hospital ${i + 1}: ${s.address}`);
-      const regTx = await contract.connect(owner).registerHospital(s.address);
-      await regTx.wait();
-    }
-  }
+  console.log(`⛓️  Connected to ModelUpdateTracker: ${contractAddress}`);
+  console.log(`🔢 Current on-chain round: ${round}`);
+  console.log(`👥 Active registered hospitals: ${activeCount} (Quorum required: ${requiredSubmissions})`);
 
   const results = [];
   for (const sub of roundData.submissions) {
     const signer = hospitalSigners[sub.hospitalIndex];
-    console.log(`📤 Submitting local model for Hospital ${sub.hospitalIndex + 1} (${signer.address})...`);
+    if (!signer) {
+      console.warn(`⚠️ No signer configured for hospital index ${sub.hospitalIndex}`);
+      continue;
+    }
+
+    // Check registration status on-chain — RESPECT REVOCATION
+    const contrib = await contract.hospitalContributions(signer.address);
+    if (!contrib.isRegistered) {
+      console.log(`🚫 Hospital Node ${sub.hospitalIndex + 1} (${signer.address}) is REVOKED/UNREGISTERED on-chain. Skipping.`);
+      continue;
+    }
+
+    const alreadySubmitted = await contract.hasSubmitted(round, signer.address);
+    if (alreadySubmitted) {
+      console.log(`ℹ️ Hospital Node ${sub.hospitalIndex + 1} (${signer.address}) already submitted for Round ${round}. Skipping.`);
+      continue;
+    }
+
+    console.log(`📤 Node ${sub.hospitalIndex + 1} signing submitLocalModel(${sub.cid.slice(0, 10)}...)...`);
     const tx = await contract.connect(signer).submitLocalModel(sub.cid, sub.hash);
     const receipt = await tx.wait();
+    console.log(`   ✓ Tx Confirmed: ${receipt.hash} (Block #${receipt.blockNumber}, Gas: ${receipt.gasUsed})`);
+
     results.push({
       hospital: sub.hospitalIndex + 1,
       address: signer.address,
@@ -51,16 +65,24 @@ async function main() {
     });
   }
 
-  // Publish global model
-  console.log(`🌍 Aggregator (${owner.address}) publishing global model...`);
+  // Verify that quorum is met before calling publishGlobalModel
+  const roundHospitals = await contract.getRoundHospitals(round);
+  if (roundHospitals.length < requiredSubmissions) {
+    throw new Error(
+      `Quorum not met for Round ${round}: received ${roundHospitals.length} submissions, requires ${requiredSubmissions}.`
+    );
+  }
+
+  // Publish global model as aggregator
+  console.log(`🌍 Central Aggregator (${owner.address}) signing publishGlobalModel...`);
   const globalTx = await contract.connect(owner).publishGlobalModel(roundData.global.cid, roundData.global.hash);
   const globalReceipt = await globalTx.wait();
-  console.log(`   ✓ Global Model Tx: ${globalReceipt.hash} (Gas used: ${globalReceipt.gasUsed})`);
+  console.log(`   ✓ Global Model Tx: ${globalReceipt.hash} (Block #${globalReceipt.blockNumber}, Gas: ${globalReceipt.gasUsed})`);
 
   const newRound = await contract.currentRound();
-  console.log(`🎉 Round advanced to: ${newRound}`);
+  console.log(`🎉 Round advanced on-chain to: ${newRound}`);
 
-  // Write round receipt manifest
+  // Write immutable round receipt manifest
   const manifestPath = path.join(__dirname, "..", "round_receipt.json");
   fs.writeFileSync(manifestPath, JSON.stringify({
     round: Number(round),
@@ -83,6 +105,6 @@ async function main() {
 main()
   .then(() => process.exit(0))
   .catch((err) => {
-    console.error("❌ On-chain round submission failed:", err);
+    console.error("❌ On-chain round orchestration failed:", err);
     process.exit(1);
   });

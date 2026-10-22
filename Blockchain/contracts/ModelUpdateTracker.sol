@@ -42,6 +42,8 @@ contract ModelUpdateTracker {
     // hospitals
     mapping(address => HospitalContribution) public hospitalContributions;
     address[] public registeredHospitals;
+    uint256 public activeHospitalCount;
+    mapping(address => bool) private hasEverBeenRegistered;
 
     // ---------------- EVENTS ----------------
     event HospitalRegistered(address hospital);
@@ -80,6 +82,7 @@ contract ModelUpdateTracker {
         aggregator = msg.sender;
         requiredSubmissions = _requiredSubmissions;
         currentRound = 1;
+        activeHospitalCount = 0;
     }
 
     // ---------------- ADMIN ----------------
@@ -87,19 +90,33 @@ contract ModelUpdateTracker {
         require(h != address(0), "zero addr");
         require(!hospitalContributions[h].isRegistered, "Already registered");
 
-        hospitalContributions[h] = HospitalContribution({
-            isRegistered: true,
-            totalSubmissions: 0,
-            lastRound: 0
-        });
+        if (!hasEverBeenRegistered[h]) {
+            hospitalContributions[h] = HospitalContribution({
+                isRegistered: true,
+                totalSubmissions: 0,
+                lastRound: 0
+            });
+            registeredHospitals.push(h);
+            hasEverBeenRegistered[h] = true;
+        } else {
+            hospitalContributions[h].isRegistered = true;
+        }
 
-        registeredHospitals.push(h);
+        activeHospitalCount++;
         emit HospitalRegistered(h);
     }
 
     function revokeHospital(address h) external onlyOwner {
         require(hospitalContributions[h].isRegistered, "Not registered");
         hospitalContributions[h].isRegistered = false;
+        if (activeHospitalCount > 0) {
+            activeHospitalCount--;
+        }
+        // Dynamic quorum safety check: ensure requiredSubmissions never exceeds activeHospitalCount
+        if (requiredSubmissions > activeHospitalCount && activeHospitalCount > 0) {
+            emit QuorumChanged(requiredSubmissions, activeHospitalCount);
+            requiredSubmissions = activeHospitalCount;
+        }
         emit HospitalRevoked(h);
     }
 
@@ -205,5 +222,30 @@ contract ModelUpdateTracker {
         returns (address[] memory)
     {
         return roundHospitals[round];
+    }
+
+    function getActiveHospitals()
+        external
+        view
+        returns (address[] memory)
+    {
+        address[] memory active = new address[](activeHospitalCount);
+        uint256 idx = 0;
+        for (uint256 i = 0; i < registeredHospitals.length; i++) {
+            address h = registeredHospitals[i];
+            if (hospitalContributions[h].isRegistered) {
+                active[idx] = h;
+                idx++;
+            }
+        }
+        return active;
+    }
+
+    function getActiveHospitalCount()
+        external
+        view
+        returns (uint256)
+    {
+        return activeHospitalCount;
     }
 }

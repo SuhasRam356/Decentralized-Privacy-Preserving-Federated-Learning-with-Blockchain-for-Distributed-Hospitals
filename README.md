@@ -522,29 +522,29 @@ The web dashboard was completely re-engineered from an ad-hoc dark prototype int
 - **Distribution Map & Live Sessions**: Visual geographic layout of participating healthcare nodes and current streaming sync sessions.
 
 ### View 2: Anamnesis Record (Doctor Console)
-- Patient intake records, total dataset sizes ($186,000$ patient records), and daily intake metrics.
-- Comprehensive table linking Patient IDs, Hospital Nodes, Chief Complaints, Intake Dates, and Validation Status.
+- Institutional partitions (`train_1.csv`, `train_2.csv`, `train_3.csv`), partitioned clinical datasets (49,613 records each, 148,839 total), with synthetic demographic PII completely stripped.
+- Anamnesis record linking Patient IDs, Hospital Nodes, Chief Complaints, Intake Dates, and Validation Status.
 
 ### View 3: Diagnosis Support Tool
 - **Medical History Entry Form**: Text fields for chief complaints, WBC count, Blood Pressure, Glucose levels, and Imaging/Radiology notes.
-- **Quick Prompt Chips**: Instant-click clinical scenarios (*"Cardiac arrhythmia with dyspnea"*, *"Severe chest pain & high blood pressure"*, *"Chronic cough & fever"*).
-- **Inference Confidence Scores**: Visual meters displaying top disease candidates with automated secondary condition notes.
-- **Explainable AI Panel**: Consensus bar graphs displaying SHAP attribution values across distributed hospital models.
+- **Quick Prompt Chips**: Instant-click clinical scenarios (*"Respiratory: Wheezing & Cough"*, *"GI: Abdominal Pain & Fever"*, *"Neuro: Anxiety & Insomnia"*, *"Derm: Skin Rash"*).
+- **PyTorch Neural Inference Confidence**: Calibrated softmax posterior meters displaying top predicted clinical disease candidates directly from global model weights.
+- **Explainable AI Panel**: Consensus bar graphs displaying attribution values across distributed hospital models.
 
 ### View 4: Model Management Console
-- Architecture metadata for `DenseNet-121-Res-v2` / `MedCPTClassifier` (7.2M parameters, 450/1000 epochs).
-- **Performance Tracking Canvas**: Multi-curve canvas graph visualizing Loss, Precision, and Recall trajectories.
-- **⚡ Trigger Aggregation Button**: Dispatches an asynchronous request to `/api/advance-round` to advance rounds and aggregate new models on-demand.
+- Architecture metadata for `MedCPTClassifier (768 -> 256 -> 793)` with 400,657 parameters.
+- **Performance Tracking Canvas**: Multi-curve canvas graph visualizing Loss, Precision, and Recall trajectories across federated rounds.
+- **⚡ Trigger Aggregation Button**: Dispatches an asynchronous request to `/api/advance-round` informing the operator of on-chain requirements.
 
 ### View 5: Hospital Network Management
-- Node health monitoring: 124 total network nodes, 1.2M gradients processed, 99.9% blockchain sync integrity.
-- Registered facilities table with IPFS CIDs, contribution meters, and green `Blockchain Verified` badges.
-- Compliance audit status cards for KVKK, GDPR, and HIPAA regulatory frameworks.
+- Dynamic on-chain node health monitoring: Live query of authorized hospital registrations (`isRegistered`, `totalSubmissions`, `lastRound`) and active quorum via EVM `eth_call`.
+- Registered facilities table with IPFS CIDs, on-chain addresses, and live registration/revocation status badges.
+- Compliance audit status cards detailing synthetic non-PII tokenized clinical ontology and Differential Privacy (DP-SGD).
 
 ### View 6: Security & Traceability Ledger
-- **Blockchain Transaction Ledger**: Displays truncated SHA-256 model hashes, hospital identifiers (MH, JH, CC), block timestamps, and commitment statuses.
-- **IPFS References Card**: Live CIDs for Global Weight Sets, Gradient Deltas, and Encryption Protocols with a one-click re-validation trigger.
-- **Audit Panel**: Zero-Knowledge Proof and Homomorphic Encryption architectural assurances.
+- **Blockchain Transaction Ledger**: Displays truncated SHA-256 model digests, hospital node addresses, block timestamps, and on-chain verification tags.
+- **IPFS References Card**: Live CIDs for Global Weight Sets with sha256 checksums and IPFS multi-node verification.
+- **Audit Panel**: Cryptographic assurance via SHA-256 digests and immutable on-chain smart contract receipts.
 
 ---
 

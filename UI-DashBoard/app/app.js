@@ -118,9 +118,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const tr = document.createElement("tr");
         const shortHash = sub.hash ? (sub.hash.slice(0, 10) + "..." + sub.hash.slice(-8)) : "0x...";
         const shortTx = sub.txHash ? (sub.txHash.slice(0, 10) + "...") : "Confirmed";
-        const hospitalName = sub.hospital === 1 ? "St. Jude Node" : (sub.hospital === 2 ? "Johns Hopkins Node" : "Mayo Clinic Node");
+        const hospitalName = `Federated Node ${sub.hospital}`;
         const badgeClass = sub.hospital === 1 ? "mh" : (sub.hospital === 2 ? "jh" : "cc");
-        const badgeText = sub.hospital === 1 ? "SJ" : (sub.hospital === 2 ? "JH" : "MC");
+        const badgeText = `N${sub.hospital}`;
         tr.innerHTML = `
           <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="mono" title="${sub.hash}" style="font-size:0.78rem;">${shortHash}</span></td>
           <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="node-badge ${badgeClass}" style="width:24px;height:24px;font-size:0.6rem;">${badgeText}</span> ${hospitalName}</td>
@@ -129,6 +129,41 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
         ledgerTbody.appendChild(tr);
       });
+    }
+
+    // Render live hospital network table
+    const hospTbody = document.getElementById("hospital-table-body");
+    if (hospTbody && state.hospitals && state.hospitals.length > 0) {
+      hospTbody.innerHTML = "";
+      state.hospitals.forEach((h) => {
+        const tr = document.createElement("tr");
+        const isReg = h.isRegistered;
+        const statusHtml = isReg
+          ? `<span style="color:var(--accent-green);font-weight:600;">● ACTIVE</span>`
+          : `<span style="color:var(--accent-red);font-weight:600;">● REVOKED</span>`;
+        const verHtml = isReg
+          ? `<span class="status-tag verified">🔗 On-Chain Authorized</span>`
+          : `<span class="status-tag outlier">⚠️ Revoked by Owner</span>`;
+
+        tr.innerHTML = `
+          <td>
+            <div><strong>${h.name}</strong></div>
+            <div style="font-size:0.75rem;color:var(--text-dim);">EHR Partition train_${h.id}.csv · Total Submissions: ${h.totalSubmissions || 0}</div>
+          </td>
+          <td>${statusHtml}</td>
+          <td><span class="mono" style="font-size:0.8rem;">${h.address}</span></td>
+          <td><code>500${h.id}</code></td>
+          <td>${verHtml}</td>
+        `;
+        hospTbody.appendChild(tr);
+      });
+    }
+
+    // Sidebar status
+    const sideDetail = document.getElementById("sidebar-sync-detail");
+    if (sideDetail && state.round) {
+      const activeCount = state.round.activeHospitalCount || (state.hospitals ? state.hospitals.filter(x => x.isRegistered).length : 3);
+      sideDetail.textContent = `System syncing across ${activeCount} active decentralized nodes.`;
     }
   }
 
@@ -203,7 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (differentials.length === 0) {
       const emptyDiv = document.createElement("div");
       emptyDiv.style.cssText = "padding:16px;text-align:center;color:var(--text-dim);font-size:0.85rem;";
-      emptyDiv.textContent = "No direct ontology matches found. Please specify additional clinical symptoms.";
+      emptyDiv.textContent = "No predictions generated. Please ensure global model weights are trained.";
       resultsList.appendChild(emptyDiv);
       return;
     }
@@ -211,14 +246,15 @@ document.addEventListener("DOMContentLoaded", () => {
     differentials.forEach((r, idx) => {
       const div = document.createElement("div");
       div.className = "diag-result-item";
+      const conf = r.confidence !== undefined ? r.confidence : 0;
       div.innerHTML = `
         <div class="diag-result-top">
           <span class="diag-disease-name">${r.disease}</span>
-          <span class="status-tag verified" style="font-size:0.7rem;">Ontology Match</span>
+          <span class="diag-confidence" style="font-weight:700;color:var(--primary);">${conf}%</span>
         </div>
-        <div class="diag-score-label">Relevance Indicators: ${r.match_score} term match(es)</div>
-        <div class="diag-bar-track"><div class="diag-bar-fill" style="width:${Math.min(100, r.match_score * 35)}%;"></div></div>
-        <div class="diag-note" style="margin-top:6px;font-size:0.75rem;color:var(--text-dim);">🔬 Matched in 793-disease clinical ontology</div>
+        <div class="diag-score-label">Calibrated Posterior Confidence: ${conf}%</div>
+        <div class="diag-bar-track"><div class="diag-bar-fill" style="width:${Math.max(5, conf)}%;"></div></div>
+        <div class="diag-note" style="margin-top:6px;font-size:0.75rem;color:var(--text-dim);">🔬 Neural Classification across 793 disease classes</div>
       `;
       resultsList.appendChild(div);
     });

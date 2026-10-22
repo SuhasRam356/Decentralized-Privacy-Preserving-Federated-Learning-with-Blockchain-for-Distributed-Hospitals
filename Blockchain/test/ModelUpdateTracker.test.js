@@ -163,4 +163,45 @@ describe("ModelUpdateTracker & Federated Learning Lifecycle", function () {
       tracker.connect(hospital1).submitLocalModel(dummyCid, dummyHash)
     ).to.be.revertedWith("Not hospital");
   });
+
+  it("Should dynamically adapt quorum when a hospital is revoked to prevent training deadlock", async function () {
+    await tracker.registerHospital(hospital1.address);
+    await tracker.registerHospital(hospital2.address);
+    await tracker.registerHospital(hospital3.address);
+
+    expect(await tracker.activeHospitalCount()).to.equal(3);
+    expect(await tracker.requiredSubmissions()).to.equal(3);
+
+    // Revoke hospital 3 -> active count drops to 2, quorum automatically adapts to 2
+    await expect(tracker.connect(owner).revokeHospital(hospital3.address))
+      .to.emit(tracker, "QuorumChanged")
+      .withArgs(3, 2);
+
+    expect(await tracker.activeHospitalCount()).to.equal(2);
+    expect(await tracker.requiredSubmissions()).to.equal(2);
+
+    const activeList = await tracker.getActiveHospitals();
+    expect(activeList.length).to.equal(2);
+    expect(activeList).to.include(hospital1.address);
+    expect(activeList).to.include(hospital2.address);
+    expect(activeList).to.not.include(hospital3.address);
+
+    // Now hospitals 1 and 2 submit their models
+    await tracker.connect(hospital1).submitLocalModel(
+      "QmH1",
+      hre.ethers.keccak256(hre.ethers.toUtf8Bytes("h1"))
+    );
+    await tracker.connect(hospital2).submitLocalModel(
+      "QmH2",
+      hre.ethers.keccak256(hre.ethers.toUtf8Bytes("h2"))
+    );
+
+    // Global model can now be published without deadlocking
+    await expect(tracker.connect(owner).publishGlobalModel(
+      "QmGlobalRound1",
+      hre.ethers.keccak256(hre.ethers.toUtf8Bytes("global"))
+    )).to.emit(tracker, "RoundAdvanced").withArgs(2);
+
+    expect(await tracker.currentRound()).to.equal(2);
+  });
 });
