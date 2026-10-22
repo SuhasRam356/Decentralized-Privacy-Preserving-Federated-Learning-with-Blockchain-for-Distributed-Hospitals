@@ -1,0 +1,55 @@
+{
+  "round": 3,
+  "onchain_current_round_after": 4,
+  "timestamp": "2026-10-22T13:26:49.063Z",
+  "random_seed": 42,
+  "contractAddress": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+  "global_model": {
+    "cid": "QmWicx3dvCKEjXV64bQEt8g6x3Xb5aPx34gFfw2cDzosdx",
+    "sha256": "0x7c7e48970d4b2dd3ecec4dcef027a2e9d31c884cc0bef7936bd49cb2aae2cfe7",
+    "txHash": "0x3ba4ee61c503869406664501561da9e80ed51151a35b75fe7948f19407fac80f",
+    "blockNumber": 25,
+    "gasUsed": "174668",
+    "architecture": "MedCPTClassifier",
+    "vocab_dim": 768,
+    "classes": 793
+  },
+  "submissions": [
+    {
+      "hospital": 1,
+      "address": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "txHash": "0x2ff3a3bedeccee2fb55295f1ef5e1d0abd7653cdda0b0544d1dd338c18a1566f",
+      "blockNumber": 22,
+      "gasUsed": "243430",
+      "cid": "QmfGurKFsBDbFH9RnkzmkRDipsE1i3zF2gfG9wiaR8rnSX",
+      "sha256": "0xfba179a00813ada8601c1918b10c35fe99d78f44ce8b712f49dfe20148d797f4",
+      "samples": 1000,
+      "loss": 6.1458,
+      "accuracy": 5.5
+    },
+    {
+      "hospital": 2,
+      "address": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "txHash": "0x93b0063125abdda549520fd2649f0610d2f64cd4b8eb0ba54941ab60ec3e80a6",
+      "blockNumber": 23,
+      "gasUsed": "226330",
+      "cid": "QmePH3QFdw4DB9aud1AZFa5NVAR2qv61XJPHyTr1gJs955",
+      "sha256": "0xee673be282220f2a9c8ca45d10aeca8780dc5bb490e37818be8e0c55bcd79bcc",
+      "samples": 1000,
+      "loss": 6.1352,
+      "accuracy": 3.5
+    },
+    {
+      "hospital": 3,
+      "address": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+      "txHash": "0x703d49f4200066b1addf85a08491ca5cd88e6a52be56ae7104f7e69bc252b48a",
+      "blockNumber": 24,
+      "gasUsed": "226330",
+      "cid": "QmWKWezZCQ7Le94WsXBUwQV44G6cWTFvVywed8rnXsXaiF",
+      "sha256": "0x7692ceeb279c7f7db822df83bf9d8bbfa90638437cfe7e731ac4ba0848aa704c",
+      "samples": 1000,
+      "loss": 6.1534,
+      "accuracy": 3.0
+    }
+  ]
+}

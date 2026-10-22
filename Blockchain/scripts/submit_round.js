@@ -23,17 +23,29 @@ async function main() {
   const round = await contract.currentRound();
   console.log(`⛓️  Current on-chain round: ${round}`);
 
+  // Ensure hospital signers are registered
+  for (let i = 0; i < hospitalSigners.length; i++) {
+    const s = hospitalSigners[i];
+    const contrib = await contract.hospitalContributions(s.address);
+    if (!contrib.isRegistered) {
+      console.log(`📝 Registering hospital ${i + 1}: ${s.address}`);
+      const regTx = await contract.connect(owner).registerHospital(s.address);
+      await regTx.wait();
+    }
+  }
+
   const results = [];
   for (const sub of roundData.submissions) {
     const signer = hospitalSigners[sub.hospitalIndex];
     console.log(`📤 Submitting local model for Hospital ${sub.hospitalIndex + 1} (${signer.address})...`);
     const tx = await contract.connect(signer).submitLocalModel(sub.cid, sub.hash);
     const receipt = await tx.wait();
-    console.log(`   ✓ Tx Hash: ${receipt.hash} (Gas used: ${receipt.gasUsed})`);
     results.push({
       hospital: sub.hospitalIndex + 1,
       address: signer.address,
       txHash: receipt.hash,
+      blockNumber: receipt.blockNumber,
+      gasUsed: receipt.gasUsed ? receipt.gasUsed.toString() : "0",
       cid: sub.cid,
       hash: sub.hash
     });
@@ -43,7 +55,7 @@ async function main() {
   console.log(`🌍 Aggregator (${owner.address}) publishing global model...`);
   const globalTx = await contract.connect(owner).publishGlobalModel(roundData.global.cid, roundData.global.hash);
   const globalReceipt = await globalTx.wait();
-  console.log(`   ✓ Global Model Tx: ${globalReceipt.hash}`);
+  console.log(`   ✓ Global Model Tx: ${globalReceipt.hash} (Gas used: ${globalReceipt.gasUsed})`);
 
   const newRound = await contract.currentRound();
   console.log(`🎉 Round advanced to: ${newRound}`);
@@ -58,7 +70,9 @@ async function main() {
     globalModel: {
       cid: roundData.global.cid,
       hash: roundData.global.hash,
-      txHash: globalReceipt.hash
+      txHash: globalReceipt.hash,
+      blockNumber: globalReceipt.blockNumber,
+      gasUsed: globalReceipt.gasUsed ? globalReceipt.gasUsed.toString() : "0"
     },
     timestamp: new Date().toISOString()
   }, null, 2));
