@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-10-17T16:35:17.584Z",
+  "results": [
+    {
+      "success": true,
+      "nodeName": "Hospital 1",
+      "apiUrl": "http://127.0.0.1:5001",
+      "cid": "QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n"
+    },
+    {
+      "success": true,
+      "nodeName": "Hospital 2",
+      "apiUrl": "http://127.0.0.1:5002",
+      "cid": "QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n"
+    },
+    {
+      "success": true,
+      "nodeName": "Hospital 3",
+      "apiUrl": "http://127.0.0.1:5003",
+      "cid": "QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n"
+    },
+    {
+      "success": true,
+      "nodeName": "Global Node",
+      "apiUrl": "http://127.0.0.1:5004",
+      "cid": "QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n"
+    }
+  ]
+}

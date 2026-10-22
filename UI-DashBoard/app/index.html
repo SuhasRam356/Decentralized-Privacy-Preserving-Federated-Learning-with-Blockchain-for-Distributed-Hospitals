@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedXChAIn — Decentralized Federated Learning Dashboard</title>
+  <meta name="description" content="Privacy-preserving decentralized federated learning dashboard for distributed hospitals with blockchain and IPFS integration.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h2>MedXChAIn</h2>
+      </div>
+
+      <!-- User Profile -->
+      <div class="user-profile">
+        <div class="user-avatar">👩‍⚕️</div>
+        <div class="user-info">
+          <span class="user-name">Dr. Seham Hakim</span>
+          <span class="user-role">Doctor</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="overview" id="nav-overview">
+          <span class="nav-icon">📊</span>
+          <span>Overview</span>
+        </button>
+        <button class="nav-item" data-tab="doctor" id="nav-doctor">
+          <span class="nav-icon">📋</span>
+          <span>Anamnesis Record</span>
+        </button>
+        <button class="nav-item" data-tab="diagnosis" id="nav-diagnosis">
+          <span class="nav-icon">🩺</span>
+          <span>Diagnosis Support</span>
+        </button>
+        <button class="nav-item" data-tab="models" id="nav-models">
+          <span class="nav-icon">⚙️</span>
+          <span>Model Management</span>
+        </button>
+        <button class="nav-item" data-tab="hospitals" id="nav-hospitals">
+          <span class="nav-icon">🏥</span>
+          <span>Hospital Management</span>
+        </button>
+        <button class="nav-item" data-tab="security" id="nav-security">
+          <span class="nav-icon">🔐</span>
+          <span>Security & Traceability</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Bottom -->
+      <div class="sidebar-status">
+        <div class="status-indicator-box">
+          <div class="indicator-dot online"></div>
+          <div>
+            <div class="status-label">Federated Learning Active</div>
+            <div class="status-detail">System syncing across 14 secure hospital nodes.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-links">
+        <button class="sidebar-link">⚙️ Settings</button>
+        <button class="sidebar-link">❓ Support</button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search hospitals or models..." id="topbar-search-input">
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-version">
+            <span class="ver-label">Global Model</span>
+            <span class="ver-value">v4.2.1</span>
+          </div>
+          <div class="topbar-last-sync">
+            <span class="sync-label">Last Global Sync</span>
+            <span class="sync-value">Just now</span>
+          </div>
+          <button class="topbar-icon-btn" id="btn-refresh" title="Refresh">🔄</button>
+          <button class="topbar-icon-btn" id="btn-network" title="Network">🔗</button>
+          <button class="topbar-icon-btn" id="btn-notifications" title="Notifications">🔔</button>
+          <button class="topbar-export-btn" id="btn-export">Export Report</button>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div class="content-area">
+
+        <!-- ============================================ -->
+        <!-- VIEW 1: Overview Dashboard                   -->
+        <!-- ============================================ -->
+        <section class="tab-view active" id="view-overview">
+          <!-- Metrics Row -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-title">Hospitals Connected</span>
+                <span class="metric-icon">🏥</span>
+              </div>
+              <div class="metric-value">14 <span class="metric-badge green">+2 this month</span></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-title">Model Updates</span>
+                <span class="metric-icon">🔄</span>
+              </div>
+              <div class="metric-value">1.2k</div>
+              <div class="metric-sub">Avg 40/day</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-title">Global Model</span>
+                <span class="metric-icon">⭐</span>
+              </div>
+              <div class="metric-value">v4.2.1 <span class="metric-badge blue">Latest</span></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-title">System Status</span>
+                <span class="metric-icon">🛡️</span>
+              </div>
+              <div class="metric-value" style="color: var(--accent-green);">ACTIVE</div>
+              <div class="metric-sub" style="color: var(--accent-green);">● Secured</div>
+            </div>
+          </div>
+
+          <!-- Two Column: Chart + Participation -->
+          <div class="overview-two-col">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <h3>Federated Model Performance</h3>
+                  <p>Diagnostic accuracy across distributed nodes (last 12 epochs)</p>
+                </div>
+                <div class="chart-toggle">
+                  <button class="chart-toggle-btn active">Accuracy</button>
+                  <button class="chart-toggle-btn">F1-Score</button>
+                </div>
+              </div>
+              <div class="chart-area">
+                <canvas id="accuracy-chart"></canvas>
+              </div>
+              <div class="chart-labels">
+                <span>Epoch 01</span>
+                <span>Epoch 04</span>
+                <span>Epoch 08</span>
+                <span>Current (v4.2.1)</span>
+              </div>
+            </div>
+            <div>
+              <div class="participation-card">
+                <h3>Hospital Participation</h3>
+                <p class="sub">Contribution levels by tier-1 nodes</p>
+                <div>
+                  <div class="participation-item">
+                    <span class="p-name">Mayo Clinic - Central</span>
+                    <span class="p-value">98%</span>
+                  </div>
+                  <div class="participation-bar"><div class="participation-bar-fill" style="width: 98%;"></div></div>
+                </div>
+                <div style="margin-top: 14px;">
+                  <div class="participation-item">
+                    <span class="p-name">St. Jude Children's</span>
+                    <span class="p-value">84%</span>
+                  </div>
+                  <div class="participation-bar"><div class="participation-bar-fill" style="width: 84%;"></div></div>
+                </div>
+                <div style="margin-top: 14px;">
+                  <div class="participation-item">
+                    <span class="p-name">Cleveland Clinic</span>
+                    <span class="p-value">72%</span>
+                  </div>
+                  <div class="participation-bar"><div class="participation-bar-fill" style="width: 72%;"></div></div>
+                </div>
+                <button class="view-node-btn">View Node Details</button>
+              </div>
+              <div class="global-dist-card">
+                <h4>🏛️ Global Distribution</h4>
+                <div class="map-placeholder">
+                  <span class="map-badge">LIVE NODES</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Learning Sessions -->
+          <div class="sessions-section">
+            <div class="sessions-header">
+              <div>
+                <h3>Active Learning Sessions</h3>
+                <p>Real-time trace of model gradient updates</p>
+              </div>
+              <div style="display:flex;gap:12px;align-items:center;">
+                <button class="deploy-btn">⚡ Deploy Update</button>
+                <a href="#" style="font-size:0.85rem;font-weight:500;">Live Stream →</a>
+              </div>
+            </div>
+            <div class="sessions-grid">
+              <div class="session-card">
+                <div class="session-icon blue">📡</div>
+                <div class="session-info">
+                  <div class="s-label">Imaging-CT-99</div>
+                  <div class="s-title">Gradient Aggregating</div>
+                  <div class="s-detail">8.4ms latency</div>
+                </div>
+              </div>
+              <div class="session-card">
+                <div class="session-icon green">🔒</div>
+                <div class="session-info">
+                  <div class="s-label">Neuro-Sync-X</div>
+                  <div class="s-title">Differential Privacy</div>
+                  <div class="s-detail encrypted">Encrypted</div>
+                </div>
+              </div>
+              <div class="session-card">
+                <div class="session-icon gray">📦</div>
+                <div class="session-info">
+                  <div class="s-label">EHR-Batch-04</div>
+                  <div class="s-title">Weights Broadcast</div>
+                  <div class="s-detail">92% complete</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- VIEW 2: Anamnesis / Doctor Console            -->
+        <!-- ============================================ -->
+        <section class="tab-view" id="view-doctor">
+          <!-- Will display similar to overview but for patient record context -->
+          <div class="page-header" style="padding:0 0 20px;">
+            <div class="page-header-left">
+              <h1>Anamnesis Record</h1>
+              <p>Patient history intake and medical record management</p>
+            </div>
+          </div>
+          <!-- Patient record placeholder content -->
+          <div class="hospital-stats-row">
+            <div class="hospital-stat-card">
+              <div class="hs-label">Total Patient Records</div>
+              <div class="hs-value">186,000</div>
+              <div class="hs-sub">Across 3 active hospital nodes</div>
+            </div>
+            <div class="hospital-stat-card">
+              <div class="hs-label">Recent Intakes</div>
+              <div class="hs-value">342</div>
+              <span class="hs-change">+28 today</span>
+            </div>
+            <div class="hospital-stat-card">
+              <div class="hs-label">Data Compliance</div>
+              <div class="integrity-badge">
+                <div class="check-icon">✓</div>
+                <div>
+                  <div class="hs-value" style="font-size:1.2rem;">99.9% Integrity</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="data-table" style="border-radius:var(--radius-lg);overflow:hidden;">
+            <table style="width:100%;border-collapse:collapse;">
+              <thead>
+                <tr>
+                  <th style="padding:12px 16px;text-align:left;font-size:0.72rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;background:var(--bg-main);border-bottom:1px solid var(--border-color);">Patient ID</th>
+                  <th style="padding:12px 16px;text-align:left;font-size:0.72rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;background:var(--bg-main);border-bottom:1px solid var(--border-color);">Hospital Node</th>
+                  <th style="padding:12px 16px;text-align:left;font-size:0.72rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;background:var(--bg-main);border-bottom:1px solid var(--border-color);">Chief Complaint</th>
+                  <th style="padding:12px 16px;text-align:left;font-size:0.72rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;background:var(--bg-main);border-bottom:1px solid var(--border-color);">Date</th>
+                  <th style="padding:12px 16px;text-align:left;font-size:0.72rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;background:var(--bg-main);border-bottom:1px solid var(--border-color);">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">PT-2024-0847</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">St. Jude Memorial</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">Chest pain, dyspnea</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">2024-10-22</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);"><span class="status-tag validated">Processed</span></td></tr>
+                <tr><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">PT-2024-0846</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">Johns Hopkins</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">Fever, abdominal pain</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">2024-10-22</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);"><span class="status-tag validated">Processed</span></td></tr>
+                <tr><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">PT-2024-0845</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">Mayo Clinic</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">Migraine, vision changes</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);">2024-10-21</td><td style="padding:14px 16px;border-bottom:1px solid var(--border-light);"><span class="status-tag pending">Pending</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- VIEW 3: Diagnosis Support                     -->
+        <!-- ============================================ -->
+        <section class="tab-view" id="view-diagnosis">
+          <div class="page-header" style="padding:0 0 8px;">
+            <div class="page-header-left" style="display:flex;align-items:center;gap:16px;">
+              <h1>Diagnosis Support</h1>
+              <span class="chip chip-green">🛡️ Privacy-Preserving AI Active</span>
+            </div>
+            <div class="page-header-right">
+              <span style="font-size:0.82rem;color:var(--text-muted);">Last sync: 2 mins ago</span>
+              <div class="topbar-version" style="margin-left:8px;">
+                <span class="ver-label" style="font-size:0.6rem;">Version</span>
+                <span class="ver-value" style="font-size:0.78rem;">🔄 v4.2.1</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="diagnosis-layout">
+            <!-- Left: Input Form -->
+            <div class="diagnosis-input-card">
+              <h3>Medical History Entry</h3>
+              <p class="sub-text">Data is encrypted locally before processing.</p>
+
+              <label class="field-label">Patient Symptoms</label>
+              <textarea class="symptom-textarea" id="symptom-input" placeholder="Describe symptoms, duration, and patient-reported history..."></textarea>
+
+              <div class="vitals-row">
+                <div class="vital-input">
+                  <label>WBC (x10³/mL)</label>
+                  <input type="text" placeholder="e.g. 7.5" id="vital-wbc">
+                </div>
+                <div class="vital-input">
+                  <label>BP (mmHg)</label>
+                  <input type="text" placeholder="120/80" id="vital-bp" value="120/80">
+                </div>
+                <div class="vital-input">
+                  <label>Glucose (mg/dL)</label>
+                  <input type="text" placeholder="95" id="vital-glucose" value="95">
+                </div>
+              </div>
+
+              <div class="imaging-section">
+                <label class="field-label">Imaging & Radiology Notes</label>
+                <input class="imaging-input" type="text" placeholder="Scan findings, DICOM metadata summary..." id="imaging-notes">
+              </div>
+
+              <div class="chips-container">
+                <button class="prompt-chip" data-symptoms="shortness of breath, chest tightness, wheezing, cough">Respiratory: Wheezing & Cough</button>
+                <button class="prompt-chip" data-symptoms="sharp abdominal pain, fever, nausea, vomiting, loss of appetite">GI: Abdominal Pain & Fever</button>
+                <button class="prompt-chip" data-symptoms="depression, severe anxiety, insomnia, panic attacks">Neuro: Anxiety & Insomnia</button>
+                <button class="prompt-chip" data-symptoms="skin swelling, itching, rash, acne">Derm: Skin Rash</button>
+              </div>
+
+              <button class="diagnose-btn" id="btn-diagnose">
+                <span>🎯</span>
+                <span>Get AI Suggestion</span>
+              </button>
+            </div>
+
+            <!-- Right: Results -->
+            <div>
+              <div class="diagnosis-results-card" id="diagnosis-results">
+                <div class="diag-result-header">
+                  <div class="bar"></div>
+                  <h3>AI Diagnostic Inference</h3>
+                </div>
+                <div id="results-list">
+                  <!-- Results rendered here by JS -->
+                  <div class="diag-result-item">
+                    <div class="diag-result-top">
+                      <span class="diag-disease-name">Cardiac Arrhythmia</span>
+                      <span class="diag-confidence">94%</span>
+                    </div>
+                    <div class="diag-score-label">Confidence Score</div>
+                    <div class="diag-bar-track"><div class="diag-bar-fill" style="width:94%;"></div></div>
+                    <div class="diag-note">🧩 Pattern matches 43 cases in global network</div>
+                  </div>
+                  <div class="diag-result-item">
+                    <div class="diag-result-top">
+                      <span class="diag-disease-name">Hypertension</span>
+                      <span class="diag-confidence">82%</span>
+                    </div>
+                    <div class="diag-score-label">Confidence Score</div>
+                    <div class="diag-bar-track"><div class="diag-bar-fill" style="width:82%;"></div></div>
+                    <div class="diag-note">🕐 Matches typical secondary diagnosis pattern</div>
+                  </div>
+                  <div class="diag-result-item" style="opacity:0.6;">
+                    <div class="diag-result-top">
+                      <span class="diag-disease-name">Sleep Apnea (Central)</span>
+                      <span class="diag-confidence">14%</span>
+                    </div>
+                    <div class="diag-bar-track"><div class="diag-bar-fill" style="width:14%;"></div></div>
+                  </div>
+                </div>
+
+                <div class="suggested-lab">
+                  <div style="display:flex;align-items:center;">
+                    <span class="sl-icon">🧪</span>
+                    <div>
+                      <div class="sl-title">Next Suggested Lab</div>
+                      <div class="sl-detail">Electrolyte Panel (K+, Mg2+)</div>
+                    </div>
+                  </div>
+                  <span class="sl-arrow">›</span>
+                </div>
+              </div>
+
+              <div class="interpretability-card">
+                <div class="interp-label">Model Interpretability</div>
+                <h4>SHAP Value Consensus</h4>
+                <div class="shap-bars">
+                  <div class="shap-bar" style="height:40%;"></div>
+                  <div class="shap-bar" style="height:55%;"></div>
+                  <div class="shap-bar" style="height:80%;"></div>
+                  <div class="shap-bar" style="height:95%;"></div>
+                  <div class="shap-bar" style="height:70%;"></div>
+                  <div class="shap-bar" style="height:45%;"></div>
+                  <div class="shap-bar" style="height:60%;"></div>
+                </div>
+                <div style="font-size:0.68rem;color:var(--text-dim);text-align:center;text-transform:uppercase;letter-spacing:1px;">Feature Contribution Map</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom info cards -->
+          <div class="diagnosis-bottom">
+            <div class="diag-info-card">
+              <div class="diag-info-icon blue">📊</div>
+              <div class="diag-info-text">
+                <h4>Global Consensus</h4>
+                <p>Cross-referenced with 1.2M anonymized case studies across the network.</p>
+              </div>
+            </div>
+            <div class="diag-info-card">
+              <div class="diag-info-icon green">🛡️</div>
+              <div class="diag-info-text">
+                <h4>Secure Compute</h4>
+                <p>Differential privacy δ=0.1 applied to all output weights.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- VIEW 4: Model Management Console              -->
+        <!-- ============================================ -->
+        <section class="tab-view" id="view-models">
+          <div class="page-header" style="padding:0 0 20px;">
+            <div class="page-header-left" style="display:flex;align-items:center;gap:16px;">
+              <h1>Model Architecture & Training</h1>
+              <span style="font-size:0.82rem;color:var(--text-muted);">⚙️ Centralized Global Aggregator active for v4.2.1-stable</span>
+            </div>
+            <div class="page-header-right">
+              <button class="btn btn-outline">🕐 Version Logs</button>
+              <button class="btn btn-primary" id="btn-advance-round">⚡ Trigger Aggregation</button>
+            </div>
+          </div>
+
+          <!-- Model Profile + Performance -->
+          <div class="model-top-section">
+            <div class="global-model-profile">
+              <div class="profile-header">
+                <h3>Global Model Profile</h3>
+                <span class="production-badge">Production Ready</span>
+              </div>
+              <div class="arch-label">Architecture</div>
+              <div class="arch-value">DenseNet-121-Res-v2</div>
+
+              <div class="model-stats">
+                <div class="model-stat-item">
+                  <div class="ms-label">Total Parameters</div>
+                  <div class="ms-value">7.2M</div>
+                </div>
+                <div class="model-stat-item">
+                  <div class="ms-label">Training Epochs</div>
+                  <div class="ms-value">450 / 1000</div>
+                </div>
+              </div>
+
+              <div class="feature-importance">
+                <h4>Feature Map Importance</h4>
+                <div class="feature-bar-row">
+                  <span class="fb-name">Imaging</span>
+                  <div class="fb-track"><div class="fb-fill" style="width:85%;"></div></div>
+                  <span class="fb-val">85%</span>
+                </div>
+                <div class="feature-bar-row">
+                  <span class="fb-name">Genomics</span>
+                  <div class="fb-track"><div class="fb-fill" style="width:42%;"></div></div>
+                  <span class="fb-val">42%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="performance-card">
+              <div class="card-header">
+                <h3 class="card-title">Performance Tracking</h3>
+                <div class="perf-legend">
+                  <div class="perf-legend-item"><div class="perf-legend-dot darkblue"></div>a1 Score</div>
+                  <div class="perf-legend-item"><div class="perf-legend-dot blue"></div>Precision</div>
+                  <div class="perf-legend-item"><div class="perf-legend-dot green"></div>Recall</div>
+                </div>
+              </div>
+              <div class="chart-area">
+                <canvas id="performance-chart"></canvas>
+              </div>
+              <div class="chart-labels">
+                <span>EP 100</span><span>EP 150</span><span>EP 200</span><span>EP 250</span>
+                <span style="color:var(--accent-red);font-weight:600;">EP 300</span>
+                <span>EP 350</span><span>EP 400</span>
+              </div>
+              <div class="perf-bottom-stats">
+                <div class="perf-stat">
+                  <div class="ps-label">Avg Loss</div>
+                  <div class="ps-value">0.024</div>
+                </div>
+                <div class="perf-stat">
+                  <div class="ps-label">Precision</div>
+                  <div class="ps-value">98.4%</div>
+                </div>
+                <div class="perf-stat">
+                  <div class="ps-label">Recall</div>
+                  <div class="ps-value">96.1%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Node Model Updates -->
+          <div class="node-updates-section">
+            <div class="section-header">
+              <div>
+                <h3>Node Model Updates</h3>
+                <p>Incoming data gradients from participating nodes</p>
+              </div>
+              <a href="#">View History ›</a>
+            </div>
+            <table class="data-table" id="models-table">
+              <thead>
+                <tr>
+                  <th>Hospital Node</th>
+                  <th>Status</th>
+                  <th>Batch Accuracy</th>
+                  <th>Local Epochs</th>
+                  <th>Received</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="models-table-body">
+                <tr>
+                  <td><span class="node-badge mh">MH</span>Mary Medical Center</td>
+                  <td><span class="status-tag validated">Validated</span></td>
+                  <td class="mono">98.2%</td>
+                  <td>20 / 20</td>
+                  <td>45s ago</td>
+                  <td>⚙️</td>
+                </tr>
+                <tr>
+                  <td><span class="node-badge jh">JH</span>Johns Hopkins Med</td>
+                  <td><span class="status-tag pending">Pending Check</span></td>
+                  <td class="mono">97.8%</td>
+                  <td>18 / 20</td>
+                  <td>3 mins ago</td>
+                  <td><button class="action-btn">Validate Update</button></td>
+                </tr>
+                <tr>
+                  <td><span class="node-badge cc">CC</span>Cleveland C.Hospital</td>
+                  <td><span class="status-tag outlier">Outlier Alert</span></td>
+                  <td class="mono">82.1%</td>
+                  <td>20 / 20</td>
+                  <td>12 mins ago</td>
+                  <td><button class="action-btn danger">Review Discrepancy</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- VIEW 5: Hospital Management                   -->
+        <!-- ============================================ -->
+        <section class="tab-view" id="view-hospitals">
+          <div class="page-header" style="padding:0 0 20px;">
+            <div class="page-header-left">
+              <h1>Hospital Network</h1>
+              <p>Manage node participation, monitor contribution levels, and verify blockchain security across the federated learning ecosystem.</p>
+            </div>
+            <div class="page-header-right">
+              <button class="btn btn-primary">🏥 Provision New Node</button>
+            </div>
+          </div>
+
+          <div class="hospital-stats-row">
+            <div class="hospital-stat-card">
+              <div class="hs-label">Active Nodes</div>
+              <div class="hs-value">124 <span class="hs-change">+3 this month</span></div>
+            </div>
+            <div class="hospital-stat-card">
+              <div class="hs-label">Total Contributions</div>
+              <div class="hs-value">1.2M <span class="hs-sub">gradients</span></div>
+            </div>
+            <div class="hospital-stat-card">
+              <div class="hs-label">Blockchain Sync</div>
+              <div class="integrity-badge">
+                <div class="check-icon">✓</div>
+                <div>
+                  <div class="hs-value" style="font-size:1.2rem;">99.9% Integrity</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Registered Facilities Table -->
+          <div class="section-header">
+            <h3>Registered Facilities</h3>
+            <div style="display:flex;gap:8px;">
+              <a href="#" style="font-size:0.85rem;font-weight:500;color:var(--primary);">Export Report</a>
+              <button class="topbar-icon-btn" style="width:28px;height:28px;font-size:0.8rem;">⚙</button>
+            </div>
+          </div>
+          <table class="data-table" id="hospital-table">
+            <thead>
+              <tr>
+                <th>Hospital Name</th>
+                <th>Status</th>
+                <th>Contribution Level</th>
+                <th>Security Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div><strong>St. Mary Medical Center</strong></div>
+                  <div style="font-size:0.75rem;color:var(--text-dim);">London, UK · Node #4292</div>
+                </td>
+                <td><span style="color:var(--accent-green);">● ACTIVE</span></td>
+                <td>
+                  <div class="contribution-cell">
+                    <span class="contribution-value">24,592</span>
+                    <div class="contribution-bar"><div class="contribution-bar-fill" style="width:30%;"></div></div>
+                  </div>
+                </td>
+                <td><span class="status-tag verified">🔗 Blockchain Verified</span></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>
+                  <div><strong>M.Hospital (Rochester)</strong></div>
+                  <div style="font-size:0.75rem;color:var(--text-dim);">Minnesota, USA · Node #8812</div>
+                </td>
+                <td><span style="color:var(--accent-green);">● ACTIVE</span></td>
+                <td>
+                  <div class="contribution-cell">
+                    <span class="contribution-value">82,104</span>
+                    <div class="contribution-bar"><div class="contribution-bar-fill" style="width:80%;"></div></div>
+                  </div>
+                </td>
+                <td><span class="status-tag verified">🔗 Blockchain Verified</span></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>
+                  <div><strong>Berlin G.Hospital</strong></div>
+                  <div style="font-size:0.75rem;color:var(--text-dim);">Berlin, GER · Node #3310</div>
+                </td>
+                <td><span style="color:var(--accent-red);">● INACTIVE</span></td>
+                <td>
+                  <div class="contribution-cell">
+                    <span class="contribution-value">0</span>
+                    <div class="contribution-bar"><div class="contribution-bar-fill" style="width:0%;"></div></div>
+                  </div>
+                </td>
+                <td><span class="status-tag flagged">⚠ Verification Pending</span></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>
+                  <div><strong>Singapore Hospital</strong></div>
+                  <div style="font-size:0.75rem;color:var(--text-dim);">Singapore · Node #1209</div>
+                </td>
+                <td><span style="color:var(--accent-green);">● ACTIVE</span></td>
+                <td>
+                  <div class="contribution-cell">
+                    <span class="contribution-value">45,291</span>
+                    <div class="contribution-bar"><div class="contribution-bar-fill" style="width:55%;"></div></div>
+                  </div>
+                </td>
+                <td><span class="status-tag verified">🔗 Blockchain Verified</span></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <span class="info">Showing 4 of 124 hospitals</span>
+            <button>‹</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>›</button>
+          </div>
+
+          <!-- Bottom Cards -->
+          <div class="bottom-cards">
+            <div class="compliance-card">
+              <h3>Automated Compliance Auditor</h3>
+              <p>Our AI constantly monitors node data integrity against KVKK and GDPR requirements in real-time. No manual intervention required.</p>
+              <button class="compliance-btn">Run Compliance Scan</button>
+            </div>
+            <div class="tech-logs-card">
+              <div class="tl-icon">🖥️</div>
+              <h3>Technical Logs</h3>
+              <p>Review low-level node handshake and gradient exchange logs.</p>
+              <a href="#" style="font-weight:600;">Access Node Terminal</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- VIEW 6: Security & Traceability               -->
+        <!-- ============================================ -->
+        <section class="tab-view" id="view-security">
+          <div class="page-header" style="padding:0 0 20px;">
+            <div class="page-header-left">
+              <h1>Security & Traceability</h1>
+              <p>Immutable ledger of all federated learning operations and model integrity logs.</p>
+            </div>
+            <div class="page-header-right">
+              <div class="sec-badge-card">
+                <span class="sbc-icon">⚙️</span>
+                <div>
+                  <div class="sbc-label">Global Model</div>
+                  <div class="sbc-value">v4.2.1-STABLE</div>
+                </div>
+              </div>
+              <div class="sec-badge-card">
+                <span class="sbc-icon">🕐</span>
+                <div>
+                  <div class="sbc-label">Last Block</div>
+                  <div class="sbc-value">2m 44s ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="security-two-col">
+            <!-- Blockchain Transaction Ledger -->
+            <div class="ledger-card">
+              <div class="ledger-header">
+                <h3>≡ Blockchain Transaction Ledger</h3>
+                <div class="ledger-actions">
+                  <button class="ledger-btn">Export CSV</button>
+                  <button class="ledger-btn primary">Live Refresh</button>
+                </div>
+              </div>
+              <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                <thead>
+                  <tr>
+                    <th style="padding:10px 12px;text-align:left;font-size:0.68rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border-color);">Model Hash (SHA-256)</th>
+                    <th style="padding:10px 12px;text-align:left;font-size:0.68rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border-color);">Hospital ID</th>
+                    <th style="padding:10px 12px;text-align:left;font-size:0.68rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border-color);">Timestamp</th>
+                    <th style="padding:10px 12px;text-align:left;font-size:0.68rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border-color);">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><a href="#" class="mono" style="font-size:0.78rem;">0x72a1b9c8d7e6f54a3b...</a></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="node-badge mh" style="width:24px;height:24px;font-size:0.6rem;">MH</span> Mary_Center_01</td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);">2023-10-24<br><span style="color:var(--text-dim);">14:22:01</span></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="status-tag committed">Committed</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><a href="#" class="mono" style="font-size:0.78rem;">0x1a2b3c4d5e6f7a8b9c...</a></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="node-badge jh" style="width:24px;height:24px;font-size:0.6rem;">JH</span> Johns_Hopkins_V2</td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);">2023-10-24<br><span style="color:var(--text-dim);">14:18:55</span></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="status-tag committed">Committed</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><a href="#" class="mono" style="font-size:0.78rem;">0xf9e8d7c6b5a43210fe...</a></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="node-badge mh" style="width:24px;height:24px;font-size:0.6rem;">MH</span> Mary_Center_01</td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);">2023-10-24<br><span style="color:var(--text-dim);">14:15:30</span></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="status-tag committed">Committed</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><a href="#" class="mono" style="font-size:0.78rem;">0xabcdef1234567890ab...</a></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="node-badge cc" style="width:24px;height:24px;font-size:0.6rem;">CC</span> Cleveland_C.Hospital_04</td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);">2023-10-24<br><span style="color:var(--text-dim);">14:10:12</span></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="status-tag committed">Committed</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><a href="#" class="mono" style="font-size:0.78rem;">0xdeadbeef12345678990...</a></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="node-badge jh" style="width:24px;height:24px;font-size:0.6rem;">JH</span> Johns_Hopkins_V2</td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);">2023-10-24<br><span style="color:var(--text-dim);">14:05:01</span></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border-light);"><span class="status-tag flagged">Flagged</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px;"><a href="#" class="mono" style="font-size:0.78rem;">0x6677889900aabbccdd...</a></td>
+                    <td style="padding:12px;"><span class="node-badge mh" style="width:24px;height:24px;font-size:0.6rem;">MH</span> Mary_Center_01</td>
+                    <td style="padding:12px;">2023-10-24<br><span style="color:var(--text-dim);">13:58:22</span></td>
+                    <td style="padding:12px;"><span class="status-tag committed">Committed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="view-history-link">View Full Ledger History</div>
+            </div>
+
+            <!-- Right Column -->
+            <div>
+              <!-- IPFS References -->
+              <div class="ipfs-refs-card">
+                <div class="ipfs-refs-header">
+                  <h3>🔗 IPFS References</h3>
+                  <span style="color:var(--accent-green);font-size:1.2rem;">✓</span>
+                </div>
+                <div class="ipfs-ref-item">
+                  <div>
+                    <div class="ref-label">Global Weight Set CID</div>
+                    <div class="ref-value">QmXoyp...3p2z</div>
+                  </div>
+                  <span class="status-tag verified">Verified</span>
+                </div>
+                <div class="ipfs-ref-item">
+                  <div>
+                    <div class="ref-label">Gradient Delta CID</div>
+                    <div class="ref-value">bafybe...y7i</div>
+                  </div>
+                  <span class="status-tag secure">Secure</span>
+                </div>
+                <div class="ipfs-ref-item">
+                  <div>
+                    <div class="ref-label">Encryption Protocol CID</div>
+                    <div class="ref-value">QmZ4t...v6nL</div>
+                  </div>
+                  <span class="status-tag verified">Verified</span>
+                </div>
+                <button class="revalidate-btn">Re-validate All CIDs</button>
+              </div>
+
+              <!-- Integrity Status -->
+              <div class="integrity-card">
+                <h4>Integrity Status</h4>
+                <p>Real-time hash validation across distributed nodes.</p>
+                <div class="integrity-bars">
+                  <div class="integrity-bar" style="height:55%;"></div>
+                  <div class="integrity-bar" style="height:70%;"></div>
+                  <div class="integrity-bar" style="height:90%;"></div>
+                  <div class="integrity-bar" style="height:75%;"></div>
+                  <div class="integrity-bar" style="height:85%;"></div>
+                  <div class="integrity-bar" style="height:95%;"></div>
+                  <div class="integrity-bar" style="height:80%;"></div>
+                </div>
+                <div class="trust-row">
+                  <span class="tr-label">Network Trust</span>
+                  <span class="tr-value">99.9%</span>
+                </div>
+              </div>
+
+              <!-- Audited Entities -->
+              <div class="audited-card">
+                <h4>Audited Entities</h4>
+                <div class="audited-item">
+                  <span class="ai-label">Participating Nodes</span>
+                  <span class="ai-value">12 active</span>
+                </div>
+                <div class="audited-item">
+                  <span class="ai-label">Validation Time</span>
+                  <span class="ai-value">14ms avg</span>
+                </div>
+                <div class="audited-item">
+                  <span class="ai-label">Consensus Algorithm</span>
+                  <span class="ai-value">Proof-of-Authority</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Automated Traceability Reporting -->
+          <div class="traceability-section">
+            <div class="trace-visual">🔗</div>
+            <div class="trace-content">
+              <h3>Automated Traceability Reporting</h3>
+              <p>Federated Health AI utilizes a private Ethereum-compatible sidechain to record every gradient update. This ensures that no single participant can tamper with the global model weights without being detected by the network consensus.</p>
+              <div class="trace-features">
+                <div class="trace-feature">
+                  <span class="tf-icon">🔐</span>
+                  <div>
+                    <div class="tf-title">Zero-Knowledge Proofs</div>
+                    <div class="tf-sub">Validating data without seeing it.</div>
+                  </div>
+                </div>
+                <div class="trace-feature">
+                  <span class="tf-icon">🔒</span>
+                  <div>
+                    <div class="tf-title">Homomorphic Encryption</div>
+                    <div class="tf-sub">Computed while encrypted.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /content-area -->
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

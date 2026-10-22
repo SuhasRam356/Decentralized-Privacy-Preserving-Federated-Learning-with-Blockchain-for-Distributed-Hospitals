@@ -1,2 +1,34 @@
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Model checkpoints & large binary arrays (preserve code)
 *.pt
 *.npy
+*.bin
+
+# Node & Hardhat
+node_modules/
+Blockchain/node_modules/
+Blockchain/artifacts/
+Blockchain/cache/
+
+# IPFS local storage cache
+ipfs-hospitals/storage/
+
+# Environment & local state
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
